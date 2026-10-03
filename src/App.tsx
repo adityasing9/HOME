@@ -51,6 +51,15 @@ const MainShell: React.FC = () => {
         <div className="absolute inset-0 bg-slate-950/65 backdrop-blur-[2px] pointer-events-none" />
       )}
 
+      {/* Dynamic Ambient Luminous Light Spheres for Pure Glass Refraction */}
+      {settings.background !== 'minimal' && (
+        <div className="fixed inset-0 overflow-hidden pointer-events-none z-0">
+          <div className="absolute top-[16%] left-[50%] -translate-x-[65%] w-[580px] h-[500px] rounded-full bg-blue-500/16 dark:bg-sky-500/16 blur-[120px] transition-all duration-1000 animate-pulse" />
+          <div className="absolute top-[32%] left-[50%] translate-x-[18%] w-[540px] h-[480px] rounded-full bg-purple-500/14 dark:bg-indigo-500/16 blur-[130px] transition-all duration-1000" />
+          <div className="absolute bottom-[10%] left-[50%] -translate-x-[25%] w-[480px] h-[400px] rounded-full bg-cyan-500/12 dark:bg-emerald-500/12 blur-[110px] transition-all duration-1000" />
+        </div>
+      )}
+
       {/* Persistent OS Header */}
       <Header />
 

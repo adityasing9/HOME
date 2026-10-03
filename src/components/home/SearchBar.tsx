@@ -212,7 +212,7 @@ export const SearchBar: React.FC = () => {
             <X className="w-3.5 h-3.5" />
           </button>
         ) : (
-          <div className="hidden sm:flex items-center gap-1 text-[10px] font-mono text-muted bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 px-2 py-0.5 rounded-md select-none">
+          <div className="hidden sm:flex items-center gap-1 text-[10px] font-mono text-muted glass-subtle border-subtle px-2 py-0.5 rounded-lg select-none shadow-xs">
             <Command className="w-2.5 h-2.5" />
             <span>K</span>
           </div>

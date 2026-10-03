@@ -75,7 +75,7 @@ export const Header: React.FC = () => {
       </div>
 
       {/* Center OS Clock & Date */}
-      <div className="hidden md:flex items-center gap-2 text-xs text-main font-medium">
+      <div className="hidden md:flex items-center gap-2 px-3.5 py-1.5 rounded-full glass-subtle border-subtle text-xs text-main font-medium shadow-sm">
         <span>{currentTime}</span>
         <span className="text-muted opacity-60">•</span>
         <span className="text-muted text-[11px]">{currentDate}</span>
@@ -98,7 +98,7 @@ export const Header: React.FC = () => {
         {canInstallPwa && (
           <button
             onClick={installPwa}
-            className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-accent text-white text-xs font-medium hover:bg-accent-hover shadow-sm transition-all"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-accent text-white text-xs font-semibold hover:bg-accent-hover shadow-sm transition-all shadow-accent/20"
             title="Install HOME to desktop/mobile"
           >
             <Download className="w-3 h-3" />
@@ -109,7 +109,7 @@ export const Header: React.FC = () => {
         {/* Theme Quick Toggle */}
         <button
           onClick={toggleTheme}
-          className="p-1.5 rounded-lg text-muted hover:text-main hover-tile transition-colors"
+          className="p-1.5 sm:p-2 rounded-xl glass-subtle border-subtle text-muted hover:text-main hover-tile transition-all shadow-sm"
           title={`Switch to ${settings.theme === 'dark' ? 'Light' : 'Dark'} mode`}
           aria-label="Toggle theme"
         >
@@ -123,7 +123,7 @@ export const Header: React.FC = () => {
         {/* Settings button */}
         <button
           onClick={() => setIsSettingsOpen(true)}
-          className="p-1.5 rounded-lg text-muted hover:text-main hover-tile transition-colors"
+          className="p-1.5 sm:p-2 rounded-xl glass-subtle border-subtle text-muted hover:text-main hover-tile transition-all shadow-sm"
           title="Open Settings (Ctrl+,)"
           aria-label="Settings"
         >
