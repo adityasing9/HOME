@@ -1,0 +1,224 @@
+@import "tailwindcss";
+
+@layer base {
+  :root {
+    --accent-color: #3b82f6;
+    --accent-hover: #2563eb;
+    --accent-light: rgba(59, 130, 246, 0.12);
+    --accent-ring: rgba(59, 130, 246, 0.35);
+    --accent-glow: rgba(59, 130, 246, 0.25);
+    --font-sans: 'Plus Jakarta Sans', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  }
+
+  [data-accent="blue"] {
+    --accent-color: #3b82f6;
+    --accent-hover: #2563eb;
+    --accent-light: rgba(59, 130, 246, 0.12);
+    --accent-ring: rgba(59, 130, 246, 0.35);
+    --accent-glow: rgba(59, 130, 246, 0.25);
+  }
+
+  [data-accent="purple"] {
+    --accent-color: #8b5cf6;
+    --accent-hover: #7c3aed;
+    --accent-light: rgba(139, 92, 246, 0.12);
+    --accent-ring: rgba(139, 92, 246, 0.35);
+    --accent-glow: rgba(139, 92, 246, 0.25);
+  }
+
+  [data-accent="green"] {
+    --accent-color: #10b981;
+    --accent-hover: #059669;
+    --accent-light: rgba(16, 185, 129, 0.12);
+    --accent-ring: rgba(16, 185, 129, 0.35);
+    --accent-glow: rgba(16, 185, 129, 0.25);
+  }
+
+  [data-accent="orange"] {
+    --accent-color: #f97316;
+    --accent-hover: #ea580c;
+    --accent-light: rgba(249, 115, 22, 0.12);
+    --accent-ring: rgba(249, 115, 22, 0.35);
+    --accent-glow: rgba(249, 115, 22, 0.25);
+  }
+
+  [data-accent="red"] {
+    --accent-color: #ef4444;
+    --accent-hover: #dc2626;
+    --accent-light: rgba(239, 68, 68, 0.12);
+    --accent-ring: rgba(239, 68, 68, 0.35);
+    --accent-glow: rgba(239, 68, 68, 0.25);
+  }
+
+  [data-accent="pink"] {
+    --accent-color: #ec4899;
+    --accent-hover: #db2777;
+    --accent-light: rgba(236, 72, 153, 0.12);
+    --accent-ring: rgba(236, 72, 153, 0.35);
+    --accent-glow: rgba(236, 72, 153, 0.25);
+  }
+
+  html, body {
+    font-family: var(--font-sans);
+    min-height: 100%;
+    margin: 0;
+    padding: 0;
+    overflow-x: hidden;
+    user-select: none;
+    -webkit-user-select: none;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  input, textarea, [contenteditable="true"] {
+    user-select: text;
+    -webkit-user-select: text;
+  }
+
+  /* Sleek custom scrollbars */
+  ::-webkit-scrollbar {
+    width: 5px;
+    height: 5px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: rgba(148, 163, 184, 0.2);
+    border-radius: 9999px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: rgba(148, 163, 184, 0.35);
+  }
+}
+
+/* ========================================================
+   HOME OPERATING SYSTEM DESIGN SYSTEM (OS MATERIALS)
+   ======================================================== */
+
+/* The Primary OS Launcher Window */
+.home-panel-window {
+  background: rgba(15, 23, 42, 0.78);
+  backdrop-filter: blur(36px) saturate(190%);
+  -webkit-backdrop-filter: blur(36px) saturate(190%);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow:
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.1),
+    0 16px 36px -8px rgba(0, 0, 0, 0.45),
+    0 32px 64px -16px rgba(0, 0, 0, 0.6);
+}
+
+.light .home-panel-window {
+  background: rgba(255, 255, 255, 0.84);
+  backdrop-filter: blur(36px) saturate(190%);
+  -webkit-backdrop-filter: blur(36px) saturate(190%);
+  border: 1px solid rgba(255, 255, 255, 0.9);
+  box-shadow:
+    inset 0 1px 0 0 rgba(255, 255, 255, 1),
+    0 12px 28px -6px rgba(15, 23, 42, 0.08),
+    0 24px 56px -12px rgba(15, 23, 42, 0.12);
+}
+
+/* Recessed OS Search Field */
+.home-search-field {
+  background: rgba(0, 0, 0, 0.28);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: inset 0 1px 3px 0 rgba(0, 0, 0, 0.2);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.light .home-search-field {
+  background: rgba(241, 245, 249, 0.85);
+  border: 1px solid rgba(203, 213, 225, 0.7);
+  box-shadow: inset 0 1px 2px 0 rgba(0, 0, 0, 0.04);
+}
+
+.home-search-field:focus-within {
+  border-color: var(--accent-color);
+  box-shadow:
+    inset 0 1px 2px 0 rgba(0, 0, 0, 0.1),
+    0 0 0 2px var(--accent-ring),
+    0 0 16px var(--accent-glow);
+}
+
+/* Sub-panel Surface / Cards */
+.glass-subtle {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  transition: all 0.15s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.light .glass-subtle {
+  background: rgba(255, 255, 255, 0.6);
+  border: 1px solid rgba(226, 232, 240, 0.9);
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.03);
+}
+
+/* Bottom System Dock Shelf */
+.home-bottom-shelf {
+  background: rgba(0, 0, 0, 0.18);
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.light .home-bottom-shelf {
+  background: rgba(248, 250, 252, 0.75);
+  border-top: 1px solid rgba(226, 232, 240, 0.8);
+}
+
+/* Accent utilities */
+.bg-accent {
+  background-color: var(--accent-color);
+}
+.bg-accent-hover:hover {
+  background-color: var(--accent-hover);
+}
+.text-accent {
+  color: var(--accent-color);
+}
+.border-accent {
+  border-color: var(--accent-color);
+}
+.bg-accent-light {
+  background-color: var(--accent-light);
+}
+
+/* Background Presets */
+.bg-preset-default {
+  background:
+    radial-gradient(circle at 50% 0%, rgba(56, 189, 248, 0.08) 0%, transparent 60%),
+    radial-gradient(circle at 50% 20%, #171f30 0%, #0c111d 55%, #060911 100%);
+}
+
+.light .bg-preset-default {
+  background:
+    radial-gradient(circle at 50% 0%, rgba(59, 130, 246, 0.06) 0%, transparent 60%),
+    radial-gradient(circle at 50% 20%, #f1f5f9 0%, #e2e8f0 60%, #cbd5e1 100%);
+}
+
+.bg-preset-midnight {
+  background:
+    radial-gradient(circle at 50% 0%, rgba(139, 92, 246, 0.12) 0%, transparent 60%),
+    radial-gradient(circle at 50% 30%, #15132d 0%, #0c0d1b 60%, #030408 100%);
+}
+
+.bg-preset-aurora {
+  background:
+    radial-gradient(circle at 25% 15%, rgba(16, 185, 129, 0.15) 0%, transparent 55%),
+    radial-gradient(circle at 80% 85%, rgba(6, 182, 212, 0.1) 0%, transparent 50%),
+    radial-gradient(circle at 50% 40%, #0d1e1c 0%, #091314 60%, #030808 100%);
+}
+
+.bg-preset-sunset {
+  background:
+    radial-gradient(circle at 30% 15%, rgba(236, 72, 153, 0.15) 0%, transparent 55%),
+    radial-gradient(circle at 75% 80%, rgba(249, 115, 22, 0.12) 0%, transparent 50%),
+    radial-gradient(circle at 50% 40%, #200f27 0%, #120718 60%, #060209 100%);
+}
+
+.bg-preset-minimal {
+  background: #090d16;
+}
+
+.light .bg-preset-minimal {
+  background: #f8fafc;
+}
