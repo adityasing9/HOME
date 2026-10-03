@@ -190,23 +190,23 @@ export const AddAppModal: React.FC = () => {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-md animate-in fade-in duration-150">
       <div
-        className="w-full max-w-lg rounded-3xl glass-panel shadow-2xl border border-white/15 overflow-hidden flex flex-col max-h-[92vh]"
+        className="w-full max-w-lg rounded-3xl home-panel-window border-subtle shadow-2xl overflow-hidden flex flex-col max-h-[92vh]"
         onClick={e => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-white/5">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-subtle">
           <div className="flex items-center gap-2.5">
             <div className="w-8 h-8 rounded-xl bg-accent/20 flex items-center justify-center">
               <Plus className="w-4 h-4 text-accent" />
             </div>
             <div>
-              <h2 className="text-base font-bold text-slate-100">Add Application</h2>
-              <p className="text-xs text-slate-400">Register a PWA or web app to your HOME launcher</p>
+              <h2 className="text-base font-bold text-main">Add Application</h2>
+              <p className="text-xs text-muted">Register a PWA or web app to your HOME launcher</p>
             </div>
           </div>
           <button
             onClick={() => setIsAddAppOpen(false)}
-            className="p-1.5 rounded-xl text-slate-400 hover:text-slate-100 hover:bg-white/10 transition-colors"
+            className="p-1.5 rounded-xl text-muted hover:text-main hover-tile transition-colors"
           >
             <X className="w-4 h-4" />
           </button>
@@ -252,18 +252,18 @@ export const AddAppModal: React.FC = () => {
 
           {/* URL Input with Auto-detection */}
           <div>
-            <label className="block text-xs font-semibold text-slate-300 mb-1.5">
+            <label className="block text-xs font-semibold text-main mb-1.5">
               Application Web URL <span className="text-rose-400">*</span>
             </label>
             <div className="relative">
-              <Globe className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+              <Globe className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted" />
               <input
                 type="text"
                 value={url}
                 onChange={e => handleUrlChange(e.target.value)}
                 placeholder="https://yourapp.com"
-                className={`w-full pl-9 pr-3 py-2 rounded-xl glass-subtle text-xs sm:text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-1 border ${
-                  urlError ? 'border-rose-500 focus:ring-rose-500' : 'border-white/10 focus:ring-accent'
+                className={`w-full pl-9 pr-3 py-2 rounded-xl home-input text-xs sm:text-sm ${
+                  urlError ? 'border-rose-500 focus:ring-rose-500' : ''
                 }`}
               />
             </div>
@@ -272,7 +272,7 @@ export const AddAppModal: React.FC = () => {
 
           {/* App Name */}
           <div>
-            <label className="block text-xs font-semibold text-slate-300 mb-1.5">
+            <label className="block text-xs font-semibold text-main mb-1.5">
               App Name <span className="text-rose-400">*</span>
             </label>
             <input
@@ -283,8 +283,8 @@ export const AddAppModal: React.FC = () => {
                 setNameError('');
               }}
               placeholder="e.g. StudyAI, Jira, Notion"
-              className={`w-full px-3.5 py-2 rounded-xl glass-subtle text-xs sm:text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-1 border ${
-                nameError ? 'border-rose-500 focus:ring-rose-500' : 'border-white/10 focus:ring-accent'
+              className={`w-full px-3.5 py-2 rounded-xl home-input text-xs sm:text-sm ${
+                nameError ? 'border-rose-500 focus:ring-rose-500' : ''
               }`}
             />
             {nameError && <p className="text-[11px] text-rose-400 mt-1">{nameError}</p>}
@@ -292,31 +292,31 @@ export const AddAppModal: React.FC = () => {
 
           {/* Description */}
           <div>
-            <label className="block text-xs font-semibold text-slate-300 mb-1.5">
-              Description <span className="text-slate-500 font-normal">(Optional)</span>
+            <label className="block text-xs font-semibold text-main mb-1.5">
+              Description <span className="text-muted font-normal">(Optional)</span>
             </label>
             <input
               type="text"
               value={description}
               onChange={e => setDescription(e.target.value)}
               placeholder="Brief summary of what this app does"
-              className="w-full px-3.5 py-2 rounded-xl glass-subtle text-xs sm:text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-1 focus:ring-accent border border-white/10"
+              className="w-full px-3.5 py-2 rounded-xl home-input text-xs sm:text-sm"
             />
           </div>
 
           {/* Category & Tags Row */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
-              <label className="block text-xs font-semibold text-slate-300 mb-1.5">
+              <label className="block text-xs font-semibold text-main mb-1.5">
                 Category
               </label>
               <select
                 value={category}
                 onChange={e => setCategory(e.target.value as DefaultCategory)}
-                className="w-full px-3 py-2 rounded-xl glass-subtle text-xs sm:text-sm text-slate-100 border border-white/10 bg-slate-900 focus:outline-none focus:ring-1 focus:ring-accent cursor-pointer"
+                className="w-full px-3 py-2 rounded-xl home-input text-xs sm:text-sm cursor-pointer"
               >
                 {CATEGORIES.map(cat => (
-                  <option key={cat} value={cat}>
+                  <option key={cat} value={cat} className="bg-white text-slate-900 dark:bg-slate-900 dark:text-slate-100">
                     {cat}
                   </option>
                 ))}
@@ -324,31 +324,31 @@ export const AddAppModal: React.FC = () => {
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-slate-300 mb-1.5">
-                Tags <span className="text-slate-500 font-normal">(comma-separated)</span>
+              <label className="block text-xs font-semibold text-main mb-1.5">
+                Tags <span className="text-muted font-normal">(comma-separated)</span>
               </label>
               <input
                 type="text"
                 value={tagsInput}
                 onChange={e => setTagsInput(e.target.value)}
                 placeholder="ai, dev, finance"
-                className="w-full px-3.5 py-2 rounded-xl glass-subtle text-xs sm:text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-1 focus:ring-accent border border-white/10"
+                className="w-full px-3.5 py-2 rounded-xl home-input text-xs sm:text-sm"
               />
             </div>
           </div>
 
           {/* Icon Selection Tabs */}
           <div>
-            <label className="block text-xs font-semibold text-slate-300 mb-1.5">
+            <label className="block text-xs font-semibold text-main mb-1.5">
               App Icon
             </label>
-            <div className="flex items-center gap-1 p-1 rounded-xl bg-white/5 border border-white/5 text-xs mb-3 overflow-x-auto">
+            <div className="flex items-center gap-1 p-1 rounded-xl glass-subtle border-subtle text-xs mb-3 overflow-x-auto">
               {detectedIconUrl && (
                 <button
                   type="button"
                   onClick={() => setIconMode('detected')}
                   className={`px-2.5 py-1 rounded-lg transition-colors whitespace-nowrap flex items-center gap-1.5 ${
-                    iconMode === 'detected' ? 'bg-accent text-white font-semibold' : 'text-slate-400 hover:text-white'
+                    iconMode === 'detected' ? 'bg-accent text-white font-semibold' : 'text-muted hover:text-main'
                   }`}
                 >
                   <Sparkles className="w-3 h-3" />
@@ -359,7 +359,7 @@ export const AddAppModal: React.FC = () => {
                 type="button"
                 onClick={() => setIconMode('emoji')}
                 className={`px-2.5 py-1 rounded-lg transition-colors whitespace-nowrap flex items-center gap-1.5 ${
-                  iconMode === 'emoji' ? 'bg-accent text-white font-semibold' : 'text-slate-400 hover:text-white'
+                  iconMode === 'emoji' ? 'bg-accent text-white font-semibold' : 'text-muted hover:text-main'
                 }`}
               >
                 <Smile className="w-3 h-3" />
@@ -369,7 +369,7 @@ export const AddAppModal: React.FC = () => {
                 type="button"
                 onClick={() => setIconMode('url')}
                 className={`px-2.5 py-1 rounded-lg transition-colors whitespace-nowrap flex items-center gap-1.5 ${
-                  iconMode === 'url' ? 'bg-accent text-white font-semibold' : 'text-slate-400 hover:text-white'
+                  iconMode === 'url' ? 'bg-accent text-white font-semibold' : 'text-muted hover:text-main'
                 }`}
               >
                 <Globe className="w-3 h-3" />
@@ -379,17 +379,17 @@ export const AddAppModal: React.FC = () => {
                 type="button"
                 onClick={() => setIconMode('upload')}
                 className={`px-2.5 py-1 rounded-lg transition-colors whitespace-nowrap flex items-center gap-1.5 ${
-                  iconMode === 'upload' ? 'bg-accent text-white font-semibold' : 'text-slate-400 hover:text-white'
+                  iconMode === 'upload' ? 'bg-accent text-white font-semibold' : 'text-muted hover:text-main'
                 }`}
               >
-                <Upload className="w-3 h-3" />
+                <Upload className="w-3.5 h-3.5" />
                 Upload
               </button>
               <button
                 type="button"
                 onClick={() => setIconMode('letter')}
                 className={`px-2.5 py-1 rounded-lg transition-colors whitespace-nowrap ${
-                  iconMode === 'letter' ? 'bg-accent text-white font-semibold' : 'text-slate-400 hover:text-white'
+                  iconMode === 'letter' ? 'bg-accent text-white font-semibold' : 'text-muted hover:text-main'
                 }`}
               >
                 Letter Tile
@@ -398,7 +398,7 @@ export const AddAppModal: React.FC = () => {
 
             {/* Mode-specific Icon Controls */}
             {iconMode === 'emoji' && (
-              <div className="flex flex-wrap gap-2 p-2.5 rounded-xl glass-subtle border border-white/5">
+              <div className="flex flex-wrap gap-2 p-2.5 rounded-xl glass-subtle border-subtle">
                 {COMMON_EMOJIS.map(em => (
                   <button
                     key={em}
@@ -407,7 +407,7 @@ export const AddAppModal: React.FC = () => {
                     className={`w-9 h-9 rounded-xl flex items-center justify-center text-lg transition-transform ${
                       selectedEmoji === em
                         ? 'bg-accent text-white scale-110 shadow-md ring-2 ring-accent'
-                        : 'bg-white/5 hover:bg-white/10'
+                        : 'bg-black/5 dark:bg-white/5 hover-tile'
                     }`}
                   >
                     {em}
@@ -419,7 +419,7 @@ export const AddAppModal: React.FC = () => {
                   value={selectedEmoji}
                   onChange={e => setSelectedEmoji(e.target.value)}
                   placeholder="Custom"
-                  className="w-16 px-2 py-1 rounded-xl glass-subtle text-center text-base text-slate-100 focus:outline-none focus:ring-1 focus:ring-accent border border-white/10"
+                  className="w-16 px-2 py-1 rounded-xl home-input text-center text-base font-medium"
                 />
               </div>
             )}
@@ -430,7 +430,7 @@ export const AddAppModal: React.FC = () => {
                 value={customIconUrl}
                 onChange={e => setCustomIconUrl(e.target.value)}
                 placeholder="https://example.com/logo.png"
-                className="w-full px-3.5 py-2 rounded-xl glass-subtle text-xs sm:text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-1 focus:ring-accent border border-white/10"
+                className="w-full px-3.5 py-2 rounded-xl home-input text-xs sm:text-sm"
               />
             )}
 
@@ -446,21 +446,21 @@ export const AddAppModal: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => fileInputRef.current?.click()}
-                  className="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-white/10 hover:bg-white/15 text-slate-200 text-xs font-semibold border border-white/10 transition-colors"
+                  className="flex items-center gap-2 px-3.5 py-2 rounded-xl glass-subtle hover-tile text-main text-xs font-semibold border-subtle transition-colors"
                 >
                   <Upload className="w-3.5 h-3.5" />
                   <span>Choose Image File...</span>
                 </button>
                 {uploadedImageData && (
-                  <span className="text-xs text-emerald-400 font-medium">Image loaded</span>
+                  <span className="text-xs text-emerald-500 font-medium">Image loaded</span>
                 )}
               </div>
             )}
           </div>
 
           {/* Live Launcher Preview */}
-          <div className="p-3.5 rounded-2xl glass-subtle border border-white/10">
-            <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block mb-2">
+          <div className="p-3.5 rounded-2xl glass-subtle border-subtle">
+            <span className="text-[10px] font-bold uppercase tracking-wider text-muted block mb-2">
               Launcher Preview
             </span>
             <div className="flex items-center gap-3">
@@ -474,10 +474,10 @@ export const AddAppModal: React.FC = () => {
                 size="md"
               />
               <div className="flex flex-col min-w-0">
-                <span className="text-sm font-bold text-slate-100 truncate">
+                <span className="text-sm font-bold text-main truncate">
                   {name || 'App Name'}
                 </span>
-                <span className="text-xs text-slate-400 truncate">
+                <span className="text-xs text-muted truncate">
                   {description || 'Your description will show here'}
                 </span>
               </div>
@@ -485,14 +485,14 @@ export const AddAppModal: React.FC = () => {
           </div>
 
           {/* Pin to HOME toggle */}
-          <div className="flex items-center justify-between p-3 rounded-2xl glass-subtle border border-white/5">
+          <div className="flex items-center justify-between p-3 rounded-2xl glass-subtle border-subtle">
             <div className="flex items-center gap-2.5">
-              <Pin className="w-4 h-4 text-sky-400" />
+              <Pin className="w-4 h-4 text-accent" />
               <div>
-                <span className="text-xs font-semibold text-slate-200 block">
+                <span className="text-xs font-semibold text-main block">
                   Pin to HOME Screen?
                 </span>
-                <span className="text-[11px] text-slate-400">
+                <span className="text-[11px] text-muted">
                   Shows in your primary centered start panel
                 </span>
               </div>
@@ -501,17 +501,17 @@ export const AddAppModal: React.FC = () => {
               type="checkbox"
               checked={pinToHome}
               onChange={e => setPinToHome(e.target.checked)}
-              className="w-4 h-4 text-accent rounded bg-slate-900 border-white/20 focus:ring-accent cursor-pointer"
+              className="w-4 h-4 text-accent rounded border-subtle focus:ring-accent cursor-pointer"
             />
           </div>
         </form>
 
         {/* Modal Actions */}
-        <div className="flex items-center justify-end gap-2.5 px-6 py-4 border-t border-white/5 bg-slate-950/40">
+        <div className="flex items-center justify-end gap-2.5 px-6 py-4 home-bottom-shelf">
           <button
             type="button"
             onClick={() => setIsAddAppOpen(false)}
-            className="px-4 py-2 rounded-xl text-xs font-semibold text-slate-400 hover:text-slate-200 hover:bg-white/5 transition-colors"
+            className="px-4 py-2 rounded-xl text-xs font-semibold text-muted hover:text-main hover-tile transition-colors"
           >
             Cancel
           </button>

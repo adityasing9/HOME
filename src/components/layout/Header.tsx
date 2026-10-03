@@ -44,7 +44,7 @@ export const Header: React.FC = () => {
         onClick={() => setActiveView('home')}
         className="flex items-center gap-2.5 cursor-pointer group"
       >
-        {/* Subtle Geometric H Icon */}
+        {/* Geometric H Icon */}
         <div className="w-7 h-7 rounded-lg bg-gradient-to-tr from-sky-500 via-blue-600 to-indigo-600 p-[1px] shadow-md shadow-blue-500/20 group-hover:scale-105 transition-transform duration-200">
           <div className="w-full h-full bg-slate-950 rounded-[7px] flex items-center justify-center">
             <svg
@@ -65,20 +65,20 @@ export const Header: React.FC = () => {
         </div>
 
         <div className="flex items-baseline gap-2">
-          <span className="text-sm font-bold tracking-tight text-slate-100 dark:text-white group-hover:text-accent transition-colors">
+          <span className="text-sm font-bold tracking-tight text-main group-hover:text-accent transition-colors">
             HOME
           </span>
-          <span className="text-[11px] text-slate-400 font-normal hidden sm:inline">
+          <span className="text-[11px] text-muted font-normal hidden sm:inline">
             Everything starts here.
           </span>
         </div>
       </div>
 
       {/* Center OS Clock & Date */}
-      <div className="hidden md:flex items-center gap-2 text-xs text-slate-300 font-medium">
+      <div className="hidden md:flex items-center gap-2 text-xs text-main font-medium">
         <span>{currentTime}</span>
-        <span className="text-slate-600">•</span>
-        <span className="text-slate-400 text-[11px]">{currentDate}</span>
+        <span className="text-muted opacity-60">•</span>
+        <span className="text-muted text-[11px]">{currentDate}</span>
       </div>
 
       {/* Right System Icons */}
@@ -86,7 +86,7 @@ export const Header: React.FC = () => {
         {/* Offline Shell badge */}
         {!isOnline && (
           <div
-            className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-300 text-xs font-medium animate-pulse"
+            className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-500 text-xs font-medium animate-pulse"
             title="External websites may not load offline. HOME local launcher is fully operational."
           >
             <WifiOff className="w-3.5 h-3.5" />
@@ -109,21 +109,21 @@ export const Header: React.FC = () => {
         {/* Theme Quick Toggle */}
         <button
           onClick={toggleTheme}
-          className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-white/10 transition-colors"
+          className="p-1.5 rounded-lg text-muted hover:text-main hover-tile transition-colors"
           title={`Switch to ${settings.theme === 'dark' ? 'Light' : 'Dark'} mode`}
           aria-label="Toggle theme"
         >
           {settings.theme === 'dark' ? (
             <Sun className="w-4 h-4 text-amber-400" />
           ) : (
-            <Moon className="w-4 h-4 text-indigo-400" />
+            <Moon className="w-4 h-4 text-indigo-500" />
           )}
         </button>
 
         {/* Settings button */}
         <button
           onClick={() => setIsSettingsOpen(true)}
-          className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-white/10 transition-colors"
+          className="p-1.5 rounded-lg text-muted hover:text-main hover-tile transition-colors"
           title="Open Settings (Ctrl+,)"
           aria-label="Settings"
         >

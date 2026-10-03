@@ -50,7 +50,6 @@ export const ContextMenu: React.FC<ContextMenuProps> = ({
     };
   }, [onClose]);
 
-  // Adjust coordinates so the menu never flows out of viewport
   const menuWidth = 210;
   const menuHeight = 280;
   const left = Math.min(position.x, window.innerWidth - menuWidth - 12);
@@ -60,12 +59,12 @@ export const ContextMenu: React.FC<ContextMenuProps> = ({
     <div
       ref={menuRef}
       style={{ left: `${Math.max(12, left)}px`, top: `${Math.max(12, top)}px` }}
-      className="fixed z-50 w-52 py-1.5 rounded-2xl glass-panel shadow-2xl border border-slate-700/50 dark:border-white/10 text-xs font-medium text-slate-200 animate-in fade-in zoom-in-95 duration-150 backdrop-blur-xl"
+      className="fixed z-50 w-52 py-1.5 rounded-2xl home-panel-window border-subtle shadow-2xl text-xs font-medium text-main animate-in fade-in zoom-in-95 duration-150 backdrop-blur-xl"
     >
       {/* App Header Preview */}
-      <div className="px-3 py-2 border-b border-white/5 mb-1 flex items-center justify-between">
-        <span className="font-semibold text-slate-100 truncate">{app.name}</span>
-        <span className="text-[10px] text-slate-400 bg-white/5 px-1.5 py-0.5 rounded-full">
+      <div className="px-3 py-2 border-b border-subtle mb-1 flex items-center justify-between">
+        <span className="font-semibold text-main truncate">{app.name}</span>
+        <span className="text-[10px] text-muted bg-black/5 dark:bg-white/5 px-1.5 py-0.5 rounded-full">
           {app.category}
         </span>
       </div>
@@ -76,9 +75,9 @@ export const ContextMenu: React.FC<ContextMenuProps> = ({
           launchApp(app);
           onClose();
         }}
-        className="w-full flex items-center gap-2.5 px-3 py-1.5 text-left hover:bg-white/10 transition-colors"
+        className="w-full flex items-center gap-2.5 px-3 py-1.5 text-left text-main hover-tile transition-colors"
       >
-        <ExternalLink className="w-3.5 h-3.5 text-sky-400" />
+        <ExternalLink className="w-3.5 h-3.5 text-sky-500" />
         <span>Open app</span>
       </button>
 
@@ -88,16 +87,16 @@ export const ContextMenu: React.FC<ContextMenuProps> = ({
           togglePin(app.id);
           onClose();
         }}
-        className="w-full flex items-center gap-2.5 px-3 py-1.5 text-left hover:bg-white/10 transition-colors"
+        className="w-full flex items-center gap-2.5 px-3 py-1.5 text-left text-main hover-tile transition-colors"
       >
         {app.pinned ? (
           <>
-            <PinOff className="w-3.5 h-3.5 text-amber-400" />
+            <PinOff className="w-3.5 h-3.5 text-amber-500" />
             <span>Unpin from HOME</span>
           </>
         ) : (
           <>
-            <Pin className="w-3.5 h-3.5 text-sky-400" />
+            <Pin className="w-3.5 h-3.5 text-sky-500" />
             <span>Pin to HOME</span>
           </>
         )}
@@ -109,11 +108,11 @@ export const ContextMenu: React.FC<ContextMenuProps> = ({
           toggleFavorite(app.id);
           onClose();
         }}
-        className="w-full flex items-center gap-2.5 px-3 py-1.5 text-left hover:bg-white/10 transition-colors"
+        className="w-full flex items-center gap-2.5 px-3 py-1.5 text-left text-main hover-tile transition-colors"
       >
         <Star
           className={`w-3.5 h-3.5 ${
-            app.favorite ? 'text-amber-400 fill-amber-400' : 'text-slate-400'
+            app.favorite ? 'text-amber-500 fill-amber-500' : 'text-muted'
           }`}
         />
         <span>{app.favorite ? 'Remove favorite' : 'Add to favorites'}</span>
@@ -121,8 +120,8 @@ export const ContextMenu: React.FC<ContextMenuProps> = ({
 
       {/* Reordering helpers if available */}
       {app.pinned && (onMoveLeft || onMoveRight) && (
-        <div className="flex items-center justify-between px-3 py-1 my-0.5 border-y border-white/5 bg-white/[0.02]">
-          <span className="text-[10px] text-slate-400">Reorder pin:</span>
+        <div className="flex items-center justify-between px-3 py-1 my-0.5 border-y border-subtle bg-black/[0.02] dark:bg-white/[0.02]">
+          <span className="text-[10px] text-muted">Reorder pin:</span>
           <div className="flex gap-1">
             {onMoveLeft && (
               <button
@@ -130,7 +129,7 @@ export const ContextMenu: React.FC<ContextMenuProps> = ({
                   onMoveLeft();
                   onClose();
                 }}
-                className="p-1 rounded hover:bg-white/10 text-slate-300"
+                className="p-1 rounded hover-tile text-main"
                 title="Move pin left"
               >
                 <ArrowLeft className="w-3 h-3" />
@@ -142,7 +141,7 @@ export const ContextMenu: React.FC<ContextMenuProps> = ({
                   onMoveRight();
                   onClose();
                 }}
-                className="p-1 rounded hover:bg-white/10 text-slate-300"
+                className="p-1 rounded hover-tile text-main"
                 title="Move pin right"
               >
                 <ArrowRight className="w-3 h-3" />
@@ -156,17 +155,17 @@ export const ContextMenu: React.FC<ContextMenuProps> = ({
       <div className="relative">
         <button
           onClick={() => setShowCategorySubmenu(prev => !prev)}
-          className="w-full flex items-center justify-between px-3 py-1.5 text-left hover:bg-white/10 transition-colors"
+          className="w-full flex items-center justify-between px-3 py-1.5 text-left text-main hover-tile transition-colors"
         >
           <div className="flex items-center gap-2.5">
-            <FolderInput className="w-3.5 h-3.5 text-indigo-400" />
+            <FolderInput className="w-3.5 h-3.5 text-indigo-500" />
             <span>Move to category</span>
           </div>
-          <span className="text-[10px] text-slate-400">›</span>
+          <span className="text-[10px] text-muted">›</span>
         </button>
 
         {showCategorySubmenu && (
-          <div className="absolute left-full top-0 ml-1 w-40 max-h-48 overflow-y-auto py-1.5 rounded-xl glass-panel shadow-2xl border border-slate-700/50 text-xs">
+          <div className="absolute left-full top-0 ml-1 w-40 max-h-48 overflow-y-auto py-1.5 rounded-xl home-panel-window border-subtle shadow-2xl text-xs">
             {CATEGORIES.map(cat => (
               <button
                 key={cat}
@@ -174,8 +173,8 @@ export const ContextMenu: React.FC<ContextMenuProps> = ({
                   updateApp(app.id, { category: cat });
                   onClose();
                 }}
-                className={`w-full text-left px-3 py-1 hover:bg-white/10 truncate ${
-                  app.category === cat ? 'text-accent font-semibold' : 'text-slate-200'
+                className={`w-full text-left px-3 py-1 hover-tile truncate ${
+                  app.category === cat ? 'text-accent font-semibold' : 'text-main'
                 }`}
               >
                 {cat}
@@ -191,14 +190,14 @@ export const ContextMenu: React.FC<ContextMenuProps> = ({
           setEditingApp(app);
           onClose();
         }}
-        className="w-full flex items-center gap-2.5 px-3 py-1.5 text-left hover:bg-white/10 transition-colors"
+        className="w-full flex items-center gap-2.5 px-3 py-1.5 text-left text-main hover-tile transition-colors"
       >
-        <Pencil className="w-3.5 h-3.5 text-slate-300" />
+        <Pencil className="w-3.5 h-3.5 text-muted" />
         <span>Edit details</span>
       </button>
 
       {/* Delete / Remove */}
-      <div className="my-1 border-t border-white/5" />
+      <div className="my-1 border-t border-subtle" />
       <button
         onClick={() => {
           if (window.confirm(`Are you sure you want to remove "${app.name}" from HOME?`)) {
@@ -206,9 +205,9 @@ export const ContextMenu: React.FC<ContextMenuProps> = ({
           }
           onClose();
         }}
-        className="w-full flex items-center gap-2.5 px-3 py-1.5 text-left text-rose-400 hover:bg-rose-500/10 transition-colors"
+        className="w-full flex items-center gap-2.5 px-3 py-1.5 text-left text-rose-500 hover:bg-rose-500/10 transition-colors"
       >
-        <Trash2 className="w-3.5 h-3.5 text-rose-400" />
+        <Trash2 className="w-3.5 h-3.5 text-rose-500" />
         <span>Remove from HOME</span>
       </button>
     </div>

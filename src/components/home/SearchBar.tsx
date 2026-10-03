@@ -179,7 +179,7 @@ export const SearchBar: React.FC = () => {
       <div className="relative flex items-center w-full px-3.5 py-2.5 rounded-2xl home-search-field">
         <Search
           className={`w-4 h-4 ml-0.5 mr-3 transition-colors flex-shrink-0 ${
-            isFocused ? 'text-accent' : 'text-slate-400'
+            isFocused ? 'text-accent' : 'text-muted'
           }`}
         />
 
@@ -195,7 +195,7 @@ export const SearchBar: React.FC = () => {
           }}
           onKeyDown={handleKeyDown}
           placeholder="Search apps, settings, and more"
-          className="w-full bg-transparent text-sm text-slate-100 dark:text-slate-100 placeholder:text-slate-400 focus:outline-none tracking-normal"
+          className="w-full bg-transparent text-sm home-search-input focus:outline-none tracking-normal"
           autoComplete="off"
           spellCheck="false"
         />
@@ -206,13 +206,13 @@ export const SearchBar: React.FC = () => {
               setSearchQuery('');
               inputRef.current?.focus();
             }}
-            className="p-1 rounded-lg text-slate-400 hover:text-slate-200 hover:bg-white/10 transition-colors"
+            className="p-1 rounded-lg text-muted hover:text-main hover-tile transition-colors"
             title="Clear search"
           >
             <X className="w-3.5 h-3.5" />
           </button>
         ) : (
-          <div className="hidden sm:flex items-center gap-1 text-[10px] font-mono text-slate-400 bg-white/5 border border-white/10 px-2 py-0.5 rounded-md select-none">
+          <div className="hidden sm:flex items-center gap-1 text-[10px] font-mono text-muted bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 px-2 py-0.5 rounded-md select-none">
             <Command className="w-2.5 h-2.5" />
             <span>K</span>
           </div>
@@ -223,11 +223,11 @@ export const SearchBar: React.FC = () => {
       {query && (isFocused || searchQuery.length > 0) && (
         <div
           ref={resultsContainerRef}
-          className="absolute left-0 right-0 top-full mt-2 max-h-[380px] overflow-y-auto rounded-2xl home-panel-window border border-white/15 p-2 z-50 animate-in fade-in zoom-in-95 duration-150 shadow-2xl"
+          className="absolute left-0 right-0 top-full mt-2 max-h-[380px] overflow-y-auto rounded-2xl home-panel-window border border-subtle p-2 z-50 animate-in fade-in zoom-in-95 duration-150 shadow-2xl"
         >
           {totalResultsCount === 0 ? (
             <div className="py-7 px-4 text-center">
-              <p className="text-xs font-semibold text-slate-300">
+              <p className="text-xs font-semibold text-muted">
                 No matching apps or settings found for "{searchQuery}"
               </p>
               <button
@@ -244,7 +244,7 @@ export const SearchBar: React.FC = () => {
             <div className="space-y-1">
               {matchingApps.length > 0 && (
                 <div>
-                  <div className="px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                  <div className="px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider text-muted">
                     Applications ({matchingApps.length})
                   </div>
                   {matchingApps.map((app, idx) => {
@@ -256,7 +256,7 @@ export const SearchBar: React.FC = () => {
                         className={`flex items-center justify-between px-3 py-2 rounded-xl cursor-pointer transition-colors duration-150 ${
                           isSelected
                             ? 'bg-accent text-white shadow-sm'
-                            : 'hover:bg-white/10 text-slate-200'
+                            : 'hover-tile text-main'
                         }`}
                       >
                         <div className="flex items-center gap-3 min-w-0">
@@ -270,7 +270,7 @@ export const SearchBar: React.FC = () => {
                                 className={`text-[10px] px-1.5 py-0.2 rounded-full font-medium ${
                                   isSelected
                                     ? 'bg-white/20 text-white'
-                                    : 'bg-white/5 text-slate-400'
+                                    : 'bg-black/5 dark:bg-white/5 text-muted'
                                 }`}
                               >
                                 {app.category}
@@ -279,7 +279,7 @@ export const SearchBar: React.FC = () => {
                             {app.description && (
                               <span
                                 className={`text-[11px] truncate ${
-                                  isSelected ? 'text-white/80' : 'text-slate-400'
+                                  isSelected ? 'text-white/80' : 'text-muted'
                                 }`}
                               >
                                 {app.description}
@@ -298,8 +298,8 @@ export const SearchBar: React.FC = () => {
               )}
 
               {matchingCommands.length > 0 && (
-                <div className="mt-2 pt-2 border-t border-white/5">
-                  <div className="px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                <div className="mt-2 pt-2 border-t border-subtle">
+                  <div className="px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider text-muted">
                     Settings & Actions ({matchingCommands.length})
                   </div>
                   {matchingCommands.map((cmd, idx) => {
@@ -312,13 +312,13 @@ export const SearchBar: React.FC = () => {
                         className={`flex items-center justify-between px-3 py-2 rounded-xl cursor-pointer transition-colors duration-150 ${
                           isSelected
                             ? 'bg-accent text-white shadow-sm'
-                            : 'hover:bg-white/10 text-slate-200'
+                            : 'hover-tile text-main'
                         }`}
                       >
                         <div className="flex items-center gap-3 min-w-0">
                           <div
                             className={`w-7 h-7 rounded-lg flex items-center justify-center ${
-                              isSelected ? 'bg-white/20' : 'bg-white/5'
+                              isSelected ? 'bg-white/20' : 'bg-black/5 dark:bg-white/5'
                             }`}
                           >
                             {cmd.icon}
@@ -329,7 +329,7 @@ export const SearchBar: React.FC = () => {
                             </span>
                             <span
                               className={`text-[11px] truncate ${
-                                isSelected ? 'text-white/80' : 'text-slate-400'
+                                isSelected ? 'text-white/80' : 'text-muted'
                               }`}
                             >
                               {cmd.description}
@@ -339,7 +339,7 @@ export const SearchBar: React.FC = () => {
 
                         <span
                           className={`text-[10px] uppercase font-semibold tracking-wider ${
-                            isSelected ? 'text-white/70' : 'text-slate-500'
+                            isSelected ? 'text-white/70' : 'text-muted'
                           }`}
                         >
                           Execute ↵

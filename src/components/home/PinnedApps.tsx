@@ -97,13 +97,13 @@ export const PinnedApps: React.FC = () => {
     <div className="w-full">
       {/* Pinned Section Header */}
       <div className="flex items-center justify-between mb-3 px-1">
-        <h2 className="text-xs sm:text-sm font-bold text-slate-100 dark:text-white tracking-normal">
+        <h2 className="text-xs sm:text-sm font-bold text-main tracking-normal">
           Pinned
         </h2>
 
         <button
           onClick={() => setActiveView('all-apps')}
-          className="group flex items-center gap-1 text-xs font-medium text-slate-400 hover:text-white transition-colors px-2.5 py-1 rounded-lg hover:bg-white/5"
+          className="group flex items-center gap-1 text-xs font-medium text-muted hover:text-main transition-colors px-2.5 py-1 rounded-lg hover-tile"
         >
           <span>All apps</span>
           <ChevronRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
@@ -113,7 +113,7 @@ export const PinnedApps: React.FC = () => {
       {/* Grid of Pinned Apps */}
       {pinnedApps.length === 0 ? (
         <div className="py-7 px-4 rounded-2xl glass-subtle text-center">
-          <p className="text-xs font-medium text-slate-300">
+          <p className="text-xs font-medium text-muted">
             Pin your favorite apps here for fast one-click access
           </p>
           <button
@@ -145,7 +145,7 @@ export const PinnedApps: React.FC = () => {
                     ? 'opacity-30 scale-95'
                     : isDragOver
                     ? 'border-2 border-accent bg-accent-light scale-105'
-                    : 'hover:bg-white/[0.07] dark:hover:bg-white/[0.06]'
+                    : 'hover-tile'
                 }`}
               >
                 {/* Favorite Star indicator */}
@@ -158,7 +158,7 @@ export const PinnedApps: React.FC = () => {
                 {/* 3-dots Context Menu button */}
                 <button
                   onClick={e => openButtonContextMenu(e, app, index)}
-                  className="absolute top-1 right-1 p-0.5 rounded-md text-slate-400 opacity-0 group-hover:opacity-100 hover:text-white hover:bg-white/10 transition-all"
+                  className="absolute top-1 right-1 p-0.5 rounded-md text-muted opacity-0 group-hover:opacity-100 hover:text-main transition-all"
                   aria-label={`Options for ${app.name}`}
                   title="More actions"
                 >
@@ -171,7 +171,7 @@ export const PinnedApps: React.FC = () => {
                 </div>
 
                 {/* App Label */}
-                <span className="w-full text-center text-[11.5px] font-medium text-slate-200 group-hover:text-white truncate mt-1">
+                <span className="w-full text-center text-[11.5px] font-medium text-main truncate mt-1">
                   {app.name}
                 </span>
               </div>

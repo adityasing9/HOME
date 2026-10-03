@@ -29,7 +29,6 @@ export const RecommendedApps: React.FC = () => {
     return new Date(timestamp).toLocaleDateString([], { month: 'short', day: 'numeric' });
   };
 
-  // Build real recommended items (6 items in 2 columns of 3 rows)
   const recentApps = [...apps]
     .filter(a => a.lastOpenedAt !== null)
     .sort((a, b) => (b.lastOpenedAt || 0) - (a.lastOpenedAt || 0));
@@ -41,7 +40,6 @@ export const RecommendedApps: React.FC = () => {
   const seenIds = new Set<string>();
   const displayedItems: { app: AppItem; meta: string }[] = [];
 
-  // 1. Recent apps
   for (const app of recentApps.slice(0, 4)) {
     seenIds.add(app.id);
     displayedItems.push({
@@ -50,7 +48,6 @@ export const RecommendedApps: React.FC = () => {
     });
   }
 
-  // 2. Frequent apps
   for (const app of frequentApps) {
     if (displayedItems.length >= 6) break;
     if (!seenIds.has(app.id)) {
@@ -62,7 +59,6 @@ export const RecommendedApps: React.FC = () => {
     }
   }
 
-  // 3. Fallback to newest added
   if (displayedItems.length < 6) {
     const newest = [...apps].sort((a, b) => b.createdAt - a.createdAt);
     for (const app of newest) {
@@ -98,7 +94,7 @@ export const RecommendedApps: React.FC = () => {
     <div className="w-full">
       {/* Recommended Section Header */}
       <div className="flex items-center justify-between mb-2.5 px-1">
-        <h2 className="text-xs sm:text-sm font-bold text-slate-100 dark:text-white tracking-normal">
+        <h2 className="text-xs sm:text-sm font-bold text-main tracking-normal">
           Recommended
         </h2>
       </div>
@@ -106,7 +102,7 @@ export const RecommendedApps: React.FC = () => {
       {/* 2-Column List Layout */}
       {displayedItems.length === 0 ? (
         <div className="py-5 px-4 rounded-2xl glass-subtle text-center">
-          <p className="text-xs text-slate-400">
+          <p className="text-xs text-muted">
             Apps you launch will appear here automatically based on your local activity.
           </p>
         </div>
@@ -117,15 +113,15 @@ export const RecommendedApps: React.FC = () => {
               key={app.id}
               onClick={() => launchApp(app)}
               onContextMenu={e => handleContextMenu(e, app)}
-              className="group flex items-center justify-between p-2 rounded-2xl hover:bg-white/[0.07] dark:hover:bg-white/[0.06] cursor-pointer transition-all duration-150 select-none"
+              className="group flex items-center justify-between p-2 rounded-2xl hover-tile cursor-pointer transition-all duration-150 select-none"
             >
               <div className="flex items-center gap-3 min-w-0">
                 <AppIcon app={app} size="sm" />
                 <div className="flex flex-col min-w-0">
-                  <span className="font-medium text-xs text-slate-100 dark:text-slate-100 group-hover:text-white truncate">
+                  <span className="font-medium text-xs text-main truncate">
                     {app.name}
                   </span>
-                  <span className="text-[11px] text-slate-400 truncate">
+                  <span className="text-[11px] text-muted truncate">
                     {meta}
                   </span>
                 </div>
@@ -133,7 +129,7 @@ export const RecommendedApps: React.FC = () => {
 
               <button
                 onClick={e => openButtonMenu(e, app)}
-                className="p-1 rounded-lg text-slate-400 opacity-0 group-hover:opacity-100 hover:text-white hover:bg-white/10 transition-all flex-shrink-0"
+                className="p-1 rounded-lg text-muted opacity-0 group-hover:opacity-100 hover:text-main hover-tile transition-all flex-shrink-0"
                 aria-label="Options"
               >
                 <MoreVertical className="w-3.5 h-3.5" />

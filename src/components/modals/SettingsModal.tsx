@@ -147,23 +147,23 @@ export const SettingsModal: React.FC = () => {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-black/60 backdrop-blur-md animate-in fade-in duration-150">
       <div
-        className="w-full max-w-3xl rounded-3xl glass-panel shadow-2xl border border-white/15 overflow-hidden flex flex-col h-[85vh] max-h-[720px]"
+        className="w-full max-w-3xl rounded-3xl home-panel-window border-subtle shadow-2xl overflow-hidden flex flex-col h-[85vh] max-h-[720px]"
         onClick={e => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-white/5">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-subtle">
           <div className="flex items-center gap-3">
             <div className="w-8 h-8 rounded-xl bg-accent/20 flex items-center justify-center">
               <Palette className="w-4 h-4 text-accent" />
             </div>
             <div>
-              <h2 className="text-base font-bold text-slate-100">HOME Settings</h2>
-              <p className="text-xs text-slate-400">Personalize your launcher and manage local data</p>
+              <h2 className="text-base font-bold text-main">HOME Settings</h2>
+              <p className="text-xs text-muted">Personalize your launcher and manage local data</p>
             </div>
           </div>
           <button
             onClick={() => setIsSettingsOpen(false)}
-            className="p-1.5 rounded-xl text-slate-400 hover:text-slate-100 hover:bg-white/10 transition-colors"
+            className="p-1.5 rounded-xl text-muted hover:text-main hover-tile transition-colors"
           >
             <X className="w-4 h-4" />
           </button>
@@ -172,7 +172,7 @@ export const SettingsModal: React.FC = () => {
         {/* Modal Main Layout: Sidebar Tabs + Content */}
         <div className="flex-1 flex flex-col md:flex-row overflow-hidden">
           {/* Navigation Sidebar */}
-          <div className="w-full md:w-52 border-b md:border-b-0 md:border-r border-white/5 p-2 flex md:flex-col gap-1 overflow-x-auto md:overflow-y-auto scrollbar-none flex-shrink-0">
+          <div className="w-full md:w-52 border-b md:border-b-0 md:border-r border-subtle p-2 flex md:flex-col gap-1 overflow-x-auto md:overflow-y-auto scrollbar-none flex-shrink-0">
             <TabButton
               active={activeTab === 'appearance'}
               onClick={() => setActiveTab('appearance')}
@@ -224,13 +224,13 @@ export const SettingsModal: React.FC = () => {
           </div>
 
           {/* Tab Content Panel */}
-          <div className="flex-1 overflow-y-auto p-4 sm:p-6 text-slate-200">
+          <div className="flex-1 overflow-y-auto p-4 sm:p-6 text-main">
             {/* 1. APPEARANCE TAB */}
             {activeTab === 'appearance' && (
               <div className="space-y-6">
                 {/* Theme Selector */}
                 <div>
-                  <h3 className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-2.5">
+                  <h3 className="text-xs font-bold uppercase tracking-wider text-muted mb-2.5">
                     Theme
                   </h3>
                   <div className="grid grid-cols-3 gap-2.5">
@@ -240,12 +240,12 @@ export const SettingsModal: React.FC = () => {
                         onClick={() => updateSettings({ theme: mode })}
                         className={`p-3 rounded-2xl border text-xs font-semibold capitalize flex flex-col items-center gap-1.5 transition-all ${
                           settings.theme === mode
-                            ? 'border-accent bg-accent-light text-white shadow-sm'
-                            : 'border-white/5 glass-subtle text-slate-400 hover:text-white hover:bg-white/10'
+                            ? 'border-accent bg-accent-light text-main shadow-sm'
+                            : 'border-subtle glass-subtle text-muted hover:text-main hover-tile'
                         }`}
                       >
-                        <span className="font-bold">{mode}</span>
-                        <span className="text-[10px] text-slate-400">
+                        <span className="font-bold text-main">{mode}</span>
+                        <span className="text-[10px] text-muted">
                           {mode === 'system' ? 'Syncs with OS' : `${mode} mode`}
                         </span>
                       </button>
@@ -255,7 +255,7 @@ export const SettingsModal: React.FC = () => {
 
                 {/* Accent Color Picker */}
                 <div>
-                  <h3 className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-2.5">
+                  <h3 className="text-xs font-bold uppercase tracking-wider text-muted mb-2.5">
                     Accent Color
                   </h3>
                   <div className="grid grid-cols-3 sm:grid-cols-6 gap-2.5">
@@ -266,7 +266,7 @@ export const SettingsModal: React.FC = () => {
                         className={`p-2.5 rounded-2xl border flex flex-col items-center gap-1.5 transition-all ${
                           settings.accentColor === acc.key
                             ? 'border-accent bg-accent-light shadow-sm'
-                            : 'border-white/5 glass-subtle hover:bg-white/10'
+                            : 'border-subtle glass-subtle hover-tile'
                         }`}
                       >
                         <span
@@ -277,7 +277,7 @@ export const SettingsModal: React.FC = () => {
                             <Check className="w-3.5 h-3.5 text-white" />
                           )}
                         </span>
-                        <span className="text-[11px] font-medium text-slate-300 truncate w-full text-center">
+                        <span className="text-[11px] font-medium text-main truncate w-full text-center">
                           {acc.name}
                         </span>
                       </button>
@@ -287,7 +287,7 @@ export const SettingsModal: React.FC = () => {
 
                 {/* Background / Wallpaper Presets */}
                 <div>
-                  <h3 className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-2.5">
+                  <h3 className="text-xs font-bold uppercase tracking-wider text-muted mb-2.5">
                     Desktop Wallpaper & Backdrop
                   </h3>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 mb-3">
@@ -297,13 +297,13 @@ export const SettingsModal: React.FC = () => {
                         onClick={() => updateSettings({ background: preset.key })}
                         className={`p-3 rounded-2xl border text-left flex items-start justify-between transition-all ${
                           settings.background === preset.key
-                            ? 'border-accent bg-accent-light text-white shadow-sm'
-                            : 'border-white/5 glass-subtle text-slate-300 hover:bg-white/10'
+                            ? 'border-accent bg-accent-light text-main shadow-sm'
+                            : 'border-subtle glass-subtle text-main hover-tile'
                         }`}
                       >
                         <div>
-                          <div className="font-semibold text-xs text-slate-100">{preset.name}</div>
-                          <div className="text-[11px] text-slate-400 mt-0.5">{preset.desc}</div>
+                          <div className="font-semibold text-xs text-main">{preset.name}</div>
+                          <div className="text-[11px] text-muted mt-0.5">{preset.desc}</div>
                         </div>
                         {settings.background === preset.key && (
                           <Check className="w-4 h-4 text-accent flex-shrink-0" />
@@ -313,14 +313,14 @@ export const SettingsModal: React.FC = () => {
                   </div>
 
                   {/* Custom Wallpaper Upload */}
-                  <div className="p-3.5 rounded-2xl glass-subtle border border-white/5 flex items-center justify-between">
+                  <div className="p-3.5 rounded-2xl glass-subtle border-subtle flex items-center justify-between">
                     <div className="flex items-center gap-3">
                       <ImageIcon className="w-4 h-4 text-accent" />
                       <div>
-                        <div className="text-xs font-semibold text-slate-200">
+                        <div className="text-xs font-semibold text-main">
                           Custom Wallpaper
                         </div>
-                        <div className="text-[11px] text-slate-400">
+                        <div className="text-[11px] text-muted">
                           {settings.customWallpaper ? 'Custom image currently active' : 'Upload an image from your device'}
                         </div>
                       </div>
@@ -336,7 +336,7 @@ export const SettingsModal: React.FC = () => {
                       />
                       <button
                         onClick={() => wallpaperInputRef.current?.click()}
-                        className="px-3 py-1.5 rounded-xl bg-white/10 hover:bg-white/15 text-xs font-semibold text-slate-200 transition-colors"
+                        className="px-3 py-1.5 rounded-xl glass-subtle hover-tile border-subtle text-xs font-semibold text-main transition-colors"
                       >
                         Choose File...
                       </button>
@@ -346,7 +346,7 @@ export const SettingsModal: React.FC = () => {
                             updateSettings({ background: 'default', customWallpaper: null });
                             showToast('Custom wallpaper removed', 'info');
                           }}
-                          className="p-1.5 rounded-xl text-rose-400 hover:bg-rose-500/10 transition-colors"
+                          className="p-1.5 rounded-xl text-rose-500 hover:bg-rose-500/10 transition-colors"
                           title="Remove custom wallpaper"
                         >
                           <Trash2 className="w-3.5 h-3.5" />
@@ -358,7 +358,7 @@ export const SettingsModal: React.FC = () => {
 
                 {/* App Icon Size */}
                 <div>
-                  <h3 className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-2.5">
+                  <h3 className="text-xs font-bold uppercase tracking-wider text-muted mb-2.5">
                     App Icon Sizing
                   </h3>
                   <div className="grid grid-cols-3 gap-2.5">
@@ -368,8 +368,8 @@ export const SettingsModal: React.FC = () => {
                         onClick={() => updateSettings({ appSize: size })}
                         className={`p-3 rounded-2xl border text-xs font-semibold capitalize transition-all ${
                           settings.appSize === size
-                            ? 'border-accent bg-accent-light text-white shadow-sm'
-                            : 'border-white/5 glass-subtle text-slate-400 hover:text-white hover:bg-white/10'
+                            ? 'border-accent bg-accent-light text-main shadow-sm'
+                            : 'border-subtle glass-subtle text-muted hover:text-main hover-tile'
                         }`}
                       >
                         {size}
@@ -379,12 +379,12 @@ export const SettingsModal: React.FC = () => {
                 </div>
 
                 {/* Smooth Animations Toggle */}
-                <div className="flex items-center justify-between p-3.5 rounded-2xl glass-subtle border border-white/5">
+                <div className="flex items-center justify-between p-3.5 rounded-2xl glass-subtle border-subtle">
                   <div>
-                    <span className="text-xs font-semibold text-slate-200 block">
+                    <span className="text-xs font-semibold text-main block">
                       Motion & Transitions
                     </span>
-                    <span className="text-[11px] text-slate-400">
+                    <span className="text-[11px] text-muted">
                       Enable smooth micro-animations across the launcher
                     </span>
                   </div>
@@ -392,7 +392,7 @@ export const SettingsModal: React.FC = () => {
                     type="checkbox"
                     checked={settings.animations}
                     onChange={e => updateSettings({ animations: e.target.checked })}
-                    className="w-4 h-4 text-accent rounded bg-slate-900 border-white/20 focus:ring-accent cursor-pointer"
+                    className="w-4 h-4 text-accent rounded border-subtle focus:ring-accent cursor-pointer"
                   />
                 </div>
               </div>
@@ -402,28 +402,28 @@ export const SettingsModal: React.FC = () => {
             {activeTab === 'apps' && (
               <div className="space-y-6">
                 <div>
-                  <label className="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">
+                  <label className="block text-xs font-bold uppercase tracking-wider text-muted mb-2">
                     Default All Apps Sorting
                   </label>
                   <select
                     value={settings.defaultSort}
                     onChange={e => updateSettings({ defaultSort: e.target.value as SortOption })}
-                    className="w-full px-3.5 py-2.5 rounded-xl glass-subtle text-xs sm:text-sm text-slate-100 border border-white/10 bg-slate-900 focus:outline-none focus:ring-1 focus:ring-accent cursor-pointer"
+                    className="w-full px-3.5 py-2.5 rounded-xl home-input text-xs sm:text-sm cursor-pointer"
                   >
-                    <option value="name-asc">Alphabetical (A → Z)</option>
-                    <option value="name-desc">Alphabetical (Z → A)</option>
-                    <option value="most-used">Most Used</option>
-                    <option value="recently-opened">Recently Opened</option>
-                    <option value="recently-added">Recently Added</option>
+                    <option value="name-asc" className="bg-white text-slate-900 dark:bg-slate-900 dark:text-slate-100">Alphabetical (A → Z)</option>
+                    <option value="name-desc" className="bg-white text-slate-900 dark:bg-slate-900 dark:text-slate-100">Alphabetical (Z → A)</option>
+                    <option value="most-used" className="bg-white text-slate-900 dark:bg-slate-900 dark:text-slate-100">Most Used</option>
+                    <option value="recently-opened" className="bg-white text-slate-900 dark:bg-slate-900 dark:text-slate-100">Recently Opened</option>
+                    <option value="recently-added" className="bg-white text-slate-900 dark:bg-slate-900 dark:text-slate-100">Recently Added</option>
                   </select>
                 </div>
 
-                <div className="flex items-center justify-between p-3.5 rounded-2xl glass-subtle border border-white/5">
+                <div className="flex items-center justify-between p-3.5 rounded-2xl glass-subtle border-subtle">
                   <div>
-                    <span className="text-xs font-semibold text-slate-200 block">
+                    <span className="text-xs font-semibold text-main block">
                       Launch In New Tab
                     </span>
-                    <span className="text-[11px] text-slate-400">
+                    <span className="text-[11px] text-muted">
                       Open external PWAs in a new browser tab (recommended for safety)
                     </span>
                   </div>
@@ -431,16 +431,16 @@ export const SettingsModal: React.FC = () => {
                     type="checkbox"
                     checked={settings.openInNewTab}
                     onChange={e => updateSettings({ openInNewTab: e.target.checked })}
-                    className="w-4 h-4 text-accent rounded bg-slate-900 border-white/20 focus:ring-accent cursor-pointer"
+                    className="w-4 h-4 text-accent rounded border-subtle focus:ring-accent cursor-pointer"
                   />
                 </div>
 
-                <div className="p-4 rounded-2xl glass-subtle border border-white/5 flex items-center justify-between">
+                <div className="p-4 rounded-2xl glass-subtle border-subtle flex items-center justify-between">
                   <div>
-                    <div className="text-xs font-semibold text-slate-200">
+                    <div className="text-xs font-semibold text-main">
                       Restore Starter Applications
                     </div>
-                    <div className="text-[11px] text-slate-400">
+                    <div className="text-[11px] text-muted">
                       Reset apps back to initial curated demo set (StudyAI, AutoFlow, RCPC, etc.)
                     </div>
                   </div>
@@ -450,7 +450,7 @@ export const SettingsModal: React.FC = () => {
                         restoreDefaults();
                       }
                     }}
-                    className="px-3 py-1.5 rounded-xl bg-white/10 hover:bg-white/15 text-xs font-semibold text-slate-200 transition-colors"
+                    className="px-3 py-1.5 rounded-xl glass-subtle hover-tile border-subtle text-xs font-semibold text-main transition-colors"
                   >
                     Restore Demo Apps
                   </button>
@@ -461,12 +461,12 @@ export const SettingsModal: React.FC = () => {
             {/* 3. SEARCH TAB */}
             {activeTab === 'search' && (
               <div className="space-y-4">
-                <div className="flex items-center justify-between p-3.5 rounded-2xl glass-subtle border border-white/5">
+                <div className="flex items-center justify-between p-3.5 rounded-2xl glass-subtle border-subtle">
                   <div>
-                    <span className="text-xs font-semibold text-slate-200 block">
+                    <span className="text-xs font-semibold text-main block">
                       Search In Descriptions
                     </span>
-                    <span className="text-[11px] text-slate-400">
+                    <span className="text-[11px] text-muted">
                       Include words inside app descriptions when typing in the search bar
                     </span>
                   </div>
@@ -474,16 +474,16 @@ export const SettingsModal: React.FC = () => {
                     type="checkbox"
                     checked={settings.searchDescriptions}
                     onChange={e => updateSettings({ searchDescriptions: e.target.checked })}
-                    className="w-4 h-4 text-accent rounded bg-slate-900 border-white/20 focus:ring-accent cursor-pointer"
+                    className="w-4 h-4 text-accent rounded border-subtle focus:ring-accent cursor-pointer"
                   />
                 </div>
 
-                <div className="flex items-center justify-between p-3.5 rounded-2xl glass-subtle border border-white/5">
+                <div className="flex items-center justify-between p-3.5 rounded-2xl glass-subtle border-subtle">
                   <div>
-                    <span className="text-xs font-semibold text-slate-200 block">
+                    <span className="text-xs font-semibold text-main block">
                       Search In Categories
                     </span>
-                    <span className="text-[11px] text-slate-400">
+                    <span className="text-[11px] text-muted">
                       Match categories like "AI", "Finance", or "Utilities" in search results
                     </span>
                   </div>
@@ -491,7 +491,7 @@ export const SettingsModal: React.FC = () => {
                     type="checkbox"
                     checked={settings.searchCategories}
                     onChange={e => updateSettings({ searchCategories: e.target.checked })}
-                    className="w-4 h-4 text-accent rounded bg-slate-900 border-white/20 focus:ring-accent cursor-pointer"
+                    className="w-4 h-4 text-accent rounded border-subtle focus:ring-accent cursor-pointer"
                   />
                 </div>
               </div>
@@ -502,22 +502,22 @@ export const SettingsModal: React.FC = () => {
               <div className="space-y-4">
                 <div className="p-4 rounded-2xl bg-emerald-500/10 border border-emerald-500/20">
                   <div className="flex items-center gap-2 mb-1">
-                    <Shield className="w-4 h-4 text-emerald-400" />
-                    <span className="text-xs font-bold text-emerald-300">
+                    <Shield className="w-4 h-4 text-emerald-500" />
+                    <span className="text-xs font-bold text-emerald-600 dark:text-emerald-400">
                       Local-First Architecture
                     </span>
                   </div>
-                  <p className="text-xs text-emerald-200/80 leading-relaxed">
+                  <p className="text-xs text-emerald-700 dark:text-emerald-200/90 leading-relaxed">
                     Your HOME data is stored 100% locally on this device. HOME has no remote servers, no databases, no tracking cookies, and does not collect telemetry of any kind.
                   </p>
                 </div>
 
-                <div className="p-3.5 rounded-2xl glass-subtle border border-white/5 flex items-center justify-between">
+                <div className="p-3.5 rounded-2xl glass-subtle border-subtle flex items-center justify-between">
                   <div>
-                    <span className="text-xs font-semibold text-slate-200 block">
+                    <span className="text-xs font-semibold text-main block">
                       Clear Recent Activity
                     </span>
-                    <span className="text-[11px] text-slate-400">
+                    <span className="text-[11px] text-muted">
                       Deletes recorded timestamps and launch frequency counters
                     </span>
                   </div>
@@ -527,7 +527,7 @@ export const SettingsModal: React.FC = () => {
                         clearActivity();
                       }
                     }}
-                    className="px-3 py-1.5 rounded-xl bg-white/10 hover:bg-white/15 text-xs font-semibold text-slate-300 hover:text-white transition-colors"
+                    className="px-3 py-1.5 rounded-xl glass-subtle hover-tile border-subtle text-xs font-semibold text-main transition-colors"
                   >
                     Clear Activity
                   </button>
@@ -535,10 +535,10 @@ export const SettingsModal: React.FC = () => {
 
                 <div className="p-3.5 rounded-2xl border border-rose-500/30 bg-rose-500/5 flex items-center justify-between">
                   <div>
-                    <span className="text-xs font-semibold text-rose-300 block">
+                    <span className="text-xs font-semibold text-rose-500 block">
                       Reset HOME Completely
                     </span>
-                    <span className="text-[11px] text-rose-400/80">
+                    <span className="text-[11px] text-rose-500/80">
                       Removes all custom apps, settings, wallpapers, and restores default state
                     </span>
                   </div>
@@ -551,7 +551,7 @@ export const SettingsModal: React.FC = () => {
                 </div>
 
                 {showResetConfirm && (
-                  <div className="p-4 rounded-2xl bg-rose-950/80 border border-rose-500/50 space-y-3">
+                  <div className="p-4 rounded-2xl bg-rose-950/90 border border-rose-500/50 space-y-3">
                     <p className="text-xs text-rose-200 font-semibold">
                       Are you completely sure? This will remove your locally stored apps, preferences, pinned apps, and activity history.
                     </p>
@@ -568,7 +568,7 @@ export const SettingsModal: React.FC = () => {
                       </button>
                       <button
                         onClick={() => setShowResetConfirm(false)}
-                        className="px-3 py-1.5 rounded-xl bg-white/10 text-slate-300 text-xs hover:bg-white/20"
+                        className="px-3 py-1.5 rounded-xl bg-white/10 text-white text-xs hover:bg-white/20"
                       >
                         Cancel
                       </button>
@@ -581,16 +581,16 @@ export const SettingsModal: React.FC = () => {
             {/* 5. STORAGE TAB */}
             {activeTab === 'storage' && (
               <div className="space-y-4">
-                <div className="p-4 rounded-2xl glass-subtle border border-white/5">
+                <div className="p-4 rounded-2xl glass-subtle border-subtle">
                   <div className="flex items-center justify-between mb-2">
-                    <span className="text-xs font-bold text-slate-200">Local Browser Storage</span>
+                    <span className="text-xs font-bold text-main">Local Browser Storage</span>
                     <span className="text-xs font-mono text-accent font-semibold">
                       {storageInfo.formatted} used
                     </span>
                   </div>
 
                   {/* Progress bar */}
-                  <div className="w-full h-2 rounded-full bg-white/5 overflow-hidden mb-3">
+                  <div className="w-full h-2 rounded-full bg-black/5 dark:bg-white/5 overflow-hidden mb-3">
                     <div
                       className="h-full bg-accent transition-all duration-300"
                       style={{ width: `${Math.max(2, storageInfo.quotaPercentage)}%` }}
@@ -598,33 +598,33 @@ export const SettingsModal: React.FC = () => {
                   </div>
 
                   <div className="grid grid-cols-3 gap-2 text-center text-xs">
-                    <div className="p-2 rounded-xl bg-white/5">
-                      <div className="text-[10px] text-slate-400">Apps Registry</div>
-                      <div className="font-mono font-semibold text-slate-200 mt-0.5">
+                    <div className="p-2 rounded-xl glass-subtle border-subtle">
+                      <div className="text-[10px] text-muted">Apps Registry</div>
+                      <div className="font-mono font-semibold text-main mt-0.5">
                         {(storageInfo.appsBytes / 1024).toFixed(1)} KB
                       </div>
                     </div>
-                    <div className="p-2 rounded-xl bg-white/5">
-                      <div className="text-[10px] text-slate-400">Settings</div>
-                      <div className="font-mono font-semibold text-slate-200 mt-0.5">
+                    <div className="p-2 rounded-xl glass-subtle border-subtle">
+                      <div className="text-[10px] text-muted">Settings</div>
+                      <div className="font-mono font-semibold text-main mt-0.5">
                         {(storageInfo.settingsBytes / 1024).toFixed(1)} KB
                       </div>
                     </div>
-                    <div className="p-2 rounded-xl bg-white/5">
-                      <div className="text-[10px] text-slate-400">Wallpaper</div>
-                      <div className="font-mono font-semibold text-slate-200 mt-0.5">
+                    <div className="p-2 rounded-xl glass-subtle border-subtle">
+                      <div className="text-[10px] text-muted">Wallpaper</div>
+                      <div className="font-mono font-semibold text-main mt-0.5">
                         {(storageInfo.wallpaperBytes / 1024).toFixed(1)} KB
                       </div>
                     </div>
                   </div>
                 </div>
 
-                <div className="p-3.5 rounded-2xl glass-subtle border border-white/5 flex items-center justify-between">
+                <div className="p-3.5 rounded-2xl glass-subtle border-subtle flex items-center justify-between">
                   <div>
-                    <span className="text-xs font-semibold text-slate-200 block">
+                    <span className="text-xs font-semibold text-main block">
                       Recalculate Storage
                     </span>
-                    <span className="text-[11px] text-slate-400">
+                    <span className="text-[11px] text-muted">
                       Query browser local storage quota and footprint
                     </span>
                   </div>
@@ -633,7 +633,7 @@ export const SettingsModal: React.FC = () => {
                       setStorageInfo(SettingsRepository.getStorageBreakdown());
                       showToast('Storage recalculated', 'info');
                     }}
-                    className="p-2 rounded-xl bg-white/10 hover:bg-white/15 text-slate-200 text-xs transition-colors"
+                    className="p-2 rounded-xl glass-subtle hover-tile border-subtle text-main text-xs transition-colors"
                   >
                     <RefreshCw className="w-3.5 h-3.5" />
                   </button>
@@ -644,11 +644,11 @@ export const SettingsModal: React.FC = () => {
             {/* 6. SHORTCUTS TAB */}
             {activeTab === 'shortcuts' && (
               <div className="space-y-3">
-                <h3 className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">
+                <h3 className="text-xs font-bold uppercase tracking-wider text-muted mb-2">
                   Keyboard Shortcuts
                 </h3>
 
-                <div className="divide-y divide-white/5 rounded-2xl glass-subtle border border-white/5 overflow-hidden text-xs">
+                <div className="divide-y divide-subtle rounded-2xl glass-subtle border-subtle overflow-hidden text-xs">
                   <ShortcutRow keys={['Ctrl / ⌘', 'K']} desc="Focus search and command bar" />
                   <ShortcutRow keys={['Esc']} desc="Clear search, close dialogs, return home" />
                   <ShortcutRow keys={['Ctrl / ⌘', ',']} desc="Open HOME settings" />
@@ -661,9 +661,9 @@ export const SettingsModal: React.FC = () => {
             {/* 7. BACKUP & RESTORE TAB */}
             {activeTab === 'backup' && (
               <div className="space-y-4">
-                <div className="p-4 rounded-2xl glass-subtle border border-white/5 space-y-2">
-                  <div className="text-xs font-bold text-slate-100">Export Backup</div>
-                  <p className="text-xs text-slate-400">
+                <div className="p-4 rounded-2xl glass-subtle border-subtle space-y-2">
+                  <div className="text-xs font-bold text-main">Export Backup</div>
+                  <p className="text-xs text-muted">
                     Download a complete JSON snapshot containing all your registered apps, pinned state, custom ordering, and visual preferences.
                   </p>
                   <button
@@ -678,9 +678,9 @@ export const SettingsModal: React.FC = () => {
                   </button>
                 </div>
 
-                <div className="p-4 rounded-2xl glass-subtle border border-white/5 space-y-2">
-                  <div className="text-xs font-bold text-slate-100">Import Backup</div>
-                  <p className="text-xs text-slate-400">
+                <div className="p-4 rounded-2xl glass-subtle border-subtle space-y-2">
+                  <div className="text-xs font-bold text-main">Import Backup</div>
+                  <p className="text-xs text-muted">
                     Restore your setup from a previously exported HOME configuration file.
                   </p>
                   <input
@@ -692,7 +692,7 @@ export const SettingsModal: React.FC = () => {
                   />
                   <button
                     onClick={() => backupInputRef.current?.click()}
-                    className="flex items-center gap-2 px-4 py-2 rounded-xl bg-white/10 hover:bg-white/15 text-slate-200 text-xs font-bold transition-colors"
+                    className="flex items-center gap-2 px-4 py-2 rounded-xl glass-subtle hover-tile border-subtle text-main text-xs font-bold transition-colors"
                   >
                     <Upload className="w-3.5 h-3.5" />
                     <span>Select Backup File...</span>
@@ -725,25 +725,25 @@ export const SettingsModal: React.FC = () => {
                 </div>
 
                 <div>
-                  <h3 className="text-lg font-bold text-slate-100">HOME</h3>
+                  <h3 className="text-lg font-bold text-main">HOME</h3>
                   <p className="text-xs text-accent font-semibold tracking-wide mt-0.5">
                     "Everything starts here."
                   </p>
-                  <p className="text-[11px] text-slate-400 mt-1">Version 1.0.0 (V1 Static Edition)</p>
+                  <p className="text-[11px] text-muted mt-1">Version 1.0.0 (V1 Static Edition)</p>
                 </div>
 
-                <p className="text-xs text-slate-400 max-w-md mx-auto leading-relaxed">
+                <p className="text-xs text-muted max-w-md mx-auto leading-relaxed">
                   A personal web app launcher and lightweight web operating system. Local-first, installable as a PWA, designed for instantaneous access to all your tools.
                 </p>
 
                 <div className="pt-2 flex justify-center gap-3 text-xs">
-                  <span className="px-3 py-1 rounded-full bg-white/5 border border-white/5 text-slate-400">
+                  <span className="px-3 py-1 rounded-full glass-subtle border-subtle text-muted">
                     Client-Side Only
                   </span>
-                  <span className="px-3 py-1 rounded-full bg-white/5 border border-white/5 text-slate-400">
+                  <span className="px-3 py-1 rounded-full glass-subtle border-subtle text-muted">
                     Zero Backend
                   </span>
-                  <span className="px-3 py-1 rounded-full bg-white/5 border border-white/5 text-slate-400">
+                  <span className="px-3 py-1 rounded-full glass-subtle border-subtle text-muted">
                     Offline Ready
                   </span>
                 </div>
@@ -769,7 +769,7 @@ const TabButton: React.FC<{
       className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold whitespace-nowrap transition-all ${
         active
           ? 'bg-accent text-white shadow-sm'
-          : 'text-slate-400 hover:text-slate-100 hover:bg-white/5'
+          : 'text-muted hover:text-main hover-tile'
       }`}
     >
       {icon}
@@ -781,12 +781,12 @@ const TabButton: React.FC<{
 const ShortcutRow: React.FC<{ keys: string[]; desc: string }> = ({ keys, desc }) => {
   return (
     <div className="flex items-center justify-between px-3.5 py-2.5">
-      <span className="text-slate-300 font-medium">{desc}</span>
+      <span className="text-main font-medium">{desc}</span>
       <div className="flex items-center gap-1">
         {keys.map((k, i) => (
           <kbd
             key={i}
-            className="px-2 py-0.5 rounded-lg bg-white/10 border border-white/10 text-[10px] font-mono font-semibold text-slate-200"
+            className="px-2 py-0.5 rounded-lg bg-black/5 dark:bg-white/10 border border-subtle text-[10px] font-mono font-semibold text-main"
           >
             {k}
           </kbd>

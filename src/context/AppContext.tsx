@@ -79,6 +79,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
     // Apply theme
     const applyTheme = (theme: 'light' | 'dark') => {
+      root.setAttribute('data-theme', theme);
       if (theme === 'light') {
         root.classList.add('light');
         root.classList.remove('dark');

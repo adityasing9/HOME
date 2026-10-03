@@ -157,23 +157,23 @@ export const EditAppModal: React.FC = () => {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-md animate-in fade-in duration-150">
       <div
-        className="w-full max-w-lg rounded-3xl glass-panel shadow-2xl border border-white/15 overflow-hidden flex flex-col max-h-[92vh]"
+        className="w-full max-w-lg rounded-3xl home-panel-window border-subtle shadow-2xl overflow-hidden flex flex-col max-h-[92vh]"
         onClick={e => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-white/5">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-subtle">
           <div className="flex items-center gap-2.5">
             <div className="w-8 h-8 rounded-xl bg-accent/20 flex items-center justify-center">
               <Pencil className="w-4 h-4 text-accent" />
             </div>
             <div>
-              <h2 className="text-base font-bold text-slate-100">Edit Application</h2>
-              <p className="text-xs text-slate-400">Modify properties for {editingApp.name}</p>
+              <h2 className="text-base font-bold text-main">Edit Application</h2>
+              <p className="text-xs text-muted">Modify properties for {editingApp.name}</p>
             </div>
           </div>
           <button
             onClick={() => setEditingApp(null)}
-            className="p-1.5 rounded-xl text-slate-400 hover:text-slate-100 hover:bg-white/10 transition-colors"
+            className="p-1.5 rounded-xl text-muted hover:text-main hover-tile transition-colors"
           >
             <X className="w-4 h-4" />
           </button>
@@ -182,7 +182,7 @@ export const EditAppModal: React.FC = () => {
         {/* Form Body */}
         <form onSubmit={handleSubmit} className="flex-1 overflow-y-auto p-6 space-y-4">
           <div>
-            <label className="block text-xs font-semibold text-slate-300 mb-1.5">
+            <label className="block text-xs font-semibold text-main mb-1.5">
               App Name <span className="text-rose-400">*</span>
             </label>
             <input
@@ -192,19 +192,19 @@ export const EditAppModal: React.FC = () => {
                 setName(e.target.value);
                 setNameError('');
               }}
-              className={`w-full px-3.5 py-2 rounded-xl glass-subtle text-xs sm:text-sm text-slate-100 focus:outline-none focus:ring-1 border ${
-                nameError ? 'border-rose-500 focus:ring-rose-500' : 'border-white/10 focus:ring-accent'
+              className={`w-full px-3.5 py-2 rounded-xl home-input text-xs sm:text-sm ${
+                nameError ? 'border-rose-500 focus:ring-rose-500' : ''
               }`}
             />
             {nameError && <p className="text-[11px] text-rose-400 mt-1">{nameError}</p>}
           </div>
 
           <div>
-            <label className="block text-xs font-semibold text-slate-300 mb-1.5">
+            <label className="block text-xs font-semibold text-main mb-1.5">
               Web URL <span className="text-rose-400">*</span>
             </label>
             <div className="relative">
-              <Globe className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+              <Globe className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted" />
               <input
                 type="text"
                 value={url}
@@ -212,8 +212,8 @@ export const EditAppModal: React.FC = () => {
                   setUrl(e.target.value);
                   setUrlError('');
                 }}
-                className={`w-full pl-9 pr-3 py-2 rounded-xl glass-subtle text-xs sm:text-sm text-slate-100 focus:outline-none focus:ring-1 border ${
-                  urlError ? 'border-rose-500 focus:ring-rose-500' : 'border-white/10 focus:ring-accent'
+                className={`w-full pl-9 pr-3 py-2 rounded-xl home-input text-xs sm:text-sm ${
+                  urlError ? 'border-rose-500 focus:ring-rose-500' : ''
                 }`}
               />
             </div>
@@ -221,29 +221,29 @@ export const EditAppModal: React.FC = () => {
           </div>
 
           <div>
-            <label className="block text-xs font-semibold text-slate-300 mb-1.5">
-              Description
+            <label className="block text-xs font-semibold text-main mb-1.5">
+              Description <span className="text-muted font-normal">(Optional)</span>
             </label>
             <input
               type="text"
               value={description}
               onChange={e => setDescription(e.target.value)}
-              className="w-full px-3.5 py-2 rounded-xl glass-subtle text-xs sm:text-sm text-slate-100 focus:outline-none focus:ring-1 focus:ring-accent border border-white/10"
+              className="w-full px-3.5 py-2 rounded-xl home-input text-xs sm:text-sm"
             />
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
-              <label className="block text-xs font-semibold text-slate-300 mb-1.5">
+              <label className="block text-xs font-semibold text-main mb-1.5">
                 Category
               </label>
               <select
                 value={category}
                 onChange={e => setCategory(e.target.value as DefaultCategory)}
-                className="w-full px-3 py-2 rounded-xl glass-subtle text-xs sm:text-sm text-slate-100 border border-white/10 bg-slate-900 focus:outline-none focus:ring-1 focus:ring-accent cursor-pointer"
+                className="w-full px-3 py-2 rounded-xl home-input text-xs sm:text-sm cursor-pointer"
               >
                 {CATEGORIES.map(cat => (
-                  <option key={cat} value={cat}>
+                  <option key={cat} value={cat} className="bg-white text-slate-900 dark:bg-slate-900 dark:text-slate-100">
                     {cat}
                   </option>
                 ))}
@@ -251,29 +251,29 @@ export const EditAppModal: React.FC = () => {
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-slate-300 mb-1.5">
-                Tags (comma-separated)
+              <label className="block text-xs font-semibold text-main mb-1.5">
+                Tags <span className="text-muted font-normal">(comma-separated)</span>
               </label>
               <input
                 type="text"
                 value={tagsInput}
                 onChange={e => setTagsInput(e.target.value)}
-                className="w-full px-3.5 py-2 rounded-xl glass-subtle text-xs sm:text-sm text-slate-100 focus:outline-none focus:ring-1 focus:ring-accent border border-white/10"
+                className="w-full px-3.5 py-2 rounded-xl home-input text-xs sm:text-sm"
               />
             </div>
           </div>
 
           {/* Icon Selection */}
           <div>
-            <label className="block text-xs font-semibold text-slate-300 mb-1.5">
+            <label className="block text-xs font-semibold text-main mb-1.5">
               App Icon
             </label>
-            <div className="flex items-center gap-1 p-1 rounded-xl bg-white/5 border border-white/5 text-xs mb-3 overflow-x-auto">
+            <div className="flex items-center gap-1 p-1 rounded-xl glass-subtle border-subtle text-xs mb-3 overflow-x-auto">
               <button
                 type="button"
                 onClick={() => setIconMode('emoji')}
                 className={`px-2.5 py-1 rounded-lg transition-colors whitespace-nowrap flex items-center gap-1.5 ${
-                  iconMode === 'emoji' ? 'bg-accent text-white font-semibold' : 'text-slate-400 hover:text-white'
+                  iconMode === 'emoji' ? 'bg-accent text-white font-semibold' : 'text-muted hover:text-main'
                 }`}
               >
                 <Smile className="w-3 h-3" />
@@ -283,7 +283,7 @@ export const EditAppModal: React.FC = () => {
                 type="button"
                 onClick={() => setIconMode('url')}
                 className={`px-2.5 py-1 rounded-lg transition-colors whitespace-nowrap flex items-center gap-1.5 ${
-                  iconMode === 'url' ? 'bg-accent text-white font-semibold' : 'text-slate-400 hover:text-white'
+                  iconMode === 'url' ? 'bg-accent text-white font-semibold' : 'text-muted hover:text-main'
                 }`}
               >
                 <Globe className="w-3 h-3" />
@@ -293,17 +293,17 @@ export const EditAppModal: React.FC = () => {
                 type="button"
                 onClick={() => setIconMode('upload')}
                 className={`px-2.5 py-1 rounded-lg transition-colors whitespace-nowrap flex items-center gap-1.5 ${
-                  iconMode === 'upload' ? 'bg-accent text-white font-semibold' : 'text-slate-400 hover:text-white'
+                  iconMode === 'upload' ? 'bg-accent text-white font-semibold' : 'text-muted hover:text-main'
                 }`}
               >
-                <Upload className="w-3 h-3" />
+                <Upload className="w-3.5 h-3.5" />
                 Upload
               </button>
               <button
                 type="button"
                 onClick={() => setIconMode('letter')}
                 className={`px-2.5 py-1 rounded-lg transition-colors whitespace-nowrap ${
-                  iconMode === 'letter' ? 'bg-accent text-white font-semibold' : 'text-slate-400 hover:text-white'
+                  iconMode === 'letter' ? 'bg-accent text-white font-semibold' : 'text-muted hover:text-main'
                 }`}
               >
                 Letter Tile
@@ -311,7 +311,7 @@ export const EditAppModal: React.FC = () => {
             </div>
 
             {iconMode === 'emoji' && (
-              <div className="flex flex-wrap gap-2 p-2.5 rounded-xl glass-subtle border border-white/5">
+              <div className="flex flex-wrap gap-2 p-2.5 rounded-xl glass-subtle border-subtle">
                 {COMMON_EMOJIS.map(em => (
                   <button
                     key={em}
@@ -320,7 +320,7 @@ export const EditAppModal: React.FC = () => {
                     className={`w-9 h-9 rounded-xl flex items-center justify-center text-lg transition-transform ${
                       selectedEmoji === em
                         ? 'bg-accent text-white scale-110 shadow-md ring-2 ring-accent'
-                        : 'bg-white/5 hover:bg-white/10'
+                        : 'bg-black/5 dark:bg-white/5 hover-tile'
                     }`}
                   >
                     {em}
@@ -331,7 +331,7 @@ export const EditAppModal: React.FC = () => {
                   maxLength={4}
                   value={selectedEmoji}
                   onChange={e => setSelectedEmoji(e.target.value)}
-                  className="w-16 px-2 py-1 rounded-xl glass-subtle text-center text-base text-slate-100 focus:outline-none focus:ring-1 focus:ring-accent border border-white/10"
+                  className="w-16 px-2 py-1 rounded-xl home-input text-center text-base font-medium"
                 />
               </div>
             )}
@@ -342,7 +342,7 @@ export const EditAppModal: React.FC = () => {
                 value={customIconUrl}
                 onChange={e => setCustomIconUrl(e.target.value)}
                 placeholder="https://example.com/logo.png"
-                className="w-full px-3.5 py-2 rounded-xl glass-subtle text-xs sm:text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-1 focus:ring-accent border border-white/10"
+                className="w-full px-3.5 py-2 rounded-xl home-input text-xs sm:text-sm"
               />
             )}
 
@@ -358,20 +358,20 @@ export const EditAppModal: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => fileInputRef.current?.click()}
-                  className="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-white/10 hover:bg-white/15 text-slate-200 text-xs font-semibold border border-white/10 transition-colors"
+                  className="flex items-center gap-2 px-3.5 py-2 rounded-xl glass-subtle hover-tile text-main text-xs font-semibold border-subtle transition-colors"
                 >
                   <Upload className="w-3.5 h-3.5" />
                   <span>Choose Image File...</span>
                 </button>
                 {uploadedImageData && (
-                  <span className="text-xs text-emerald-400 font-medium">New image loaded</span>
+                  <span className="text-xs text-emerald-500 font-medium">New image loaded</span>
                 )}
               </div>
             )}
           </div>
 
           {/* Preview */}
-          <div className="p-3.5 rounded-2xl glass-subtle border border-white/10 flex items-center gap-3">
+          <div className="p-3.5 rounded-2xl glass-subtle border-subtle flex items-center gap-3">
             <AppIcon
               app={{
                 name: name || 'App',
@@ -382,43 +382,43 @@ export const EditAppModal: React.FC = () => {
               size="md"
             />
             <div className="flex flex-col min-w-0">
-              <span className="text-sm font-bold text-slate-100 truncate">{name}</span>
-              <span className="text-xs text-slate-400 truncate">{category}</span>
+              <span className="text-sm font-bold text-main truncate">{name}</span>
+              <span className="text-xs text-muted truncate">{category}</span>
             </div>
           </div>
 
           {/* Pinned & Favorite switches */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            <div className="flex items-center justify-between p-3 rounded-2xl glass-subtle border border-white/5">
+            <div className="flex items-center justify-between p-3 rounded-2xl glass-subtle border-subtle">
               <div className="flex items-center gap-2">
-                <Pin className="w-4 h-4 text-sky-400" />
-                <span className="text-xs font-semibold text-slate-200">Pinned to HOME</span>
+                <Pin className="w-4 h-4 text-accent" />
+                <span className="text-xs font-semibold text-main">Pinned to HOME</span>
               </div>
               <input
                 type="checkbox"
                 checked={pinned}
                 onChange={e => setPinned(e.target.checked)}
-                className="w-4 h-4 text-accent rounded bg-slate-900 border-white/20 focus:ring-accent cursor-pointer"
+                className="w-4 h-4 text-accent rounded border-subtle focus:ring-accent cursor-pointer"
               />
             </div>
 
-            <div className="flex items-center justify-between p-3 rounded-2xl glass-subtle border border-white/5">
+            <div className="flex items-center justify-between p-3 rounded-2xl glass-subtle border-subtle">
               <div className="flex items-center gap-2">
-                <Star className="w-4 h-4 text-amber-400 fill-amber-400" />
-                <span className="text-xs font-semibold text-slate-200">Favorite</span>
+                <Star className="w-4 h-4 text-amber-500 fill-amber-500" />
+                <span className="text-xs font-semibold text-main">Favorite</span>
               </div>
               <input
                 type="checkbox"
                 checked={favorite}
                 onChange={e => setFavorite(e.target.checked)}
-                className="w-4 h-4 text-accent rounded bg-slate-900 border-white/20 focus:ring-accent cursor-pointer"
+                className="w-4 h-4 text-accent rounded border-subtle focus:ring-accent cursor-pointer"
               />
             </div>
           </div>
         </form>
 
         {/* Modal Actions */}
-        <div className="flex items-center justify-between px-6 py-4 border-t border-white/5 bg-slate-950/40">
+        <div className="flex items-center justify-between px-6 py-4 home-bottom-shelf">
           <button
             type="button"
             onClick={() => {
@@ -427,7 +427,7 @@ export const EditAppModal: React.FC = () => {
                 setEditingApp(null);
               }
             }}
-            className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold text-rose-400 hover:bg-rose-500/10 transition-colors"
+            className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold text-rose-500 hover:bg-rose-500/10 transition-colors"
           >
             <Trash2 className="w-3.5 h-3.5" />
             <span>Remove App</span>
@@ -437,7 +437,7 @@ export const EditAppModal: React.FC = () => {
             <button
               type="button"
               onClick={() => setEditingApp(null)}
-              className="px-4 py-2 rounded-xl text-xs font-semibold text-slate-400 hover:text-slate-200 hover:bg-white/5 transition-colors"
+              className="px-4 py-2 rounded-xl text-xs font-semibold text-muted hover:text-main hover-tile transition-colors"
             >
               Cancel
             </button>
