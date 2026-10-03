@@ -3,6 +3,9 @@
 > **"Everything starts here."**  
 > *One home for all your apps.*
 
+[![Live Demo](https://img.shields.io/badge/Live%20Demo-home--rose--xi.vercel.app-blue?style=for-the-badge&logo=vercel)](https://home-rose-xi.vercel.app)
+[![GitHub Repository](https://img.shields.io/badge/GitHub-adityasing9%2FHOME-black?style=for-the-badge&logo=github)](https://github.com/adityasing9/HOME)
+
 A personal Progressive Web App (PWA), web app launcher, and lightweight personal web operating system.
 
 ---
