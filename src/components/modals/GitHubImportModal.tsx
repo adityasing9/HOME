@@ -370,14 +370,14 @@ export const GitHubImportModal: React.FC = () => {
         {discoveredApps.length > 0 && (
           <div className="px-5 py-3 border-b border-subtle bg-slate-100/40 dark:bg-slate-950/20 flex flex-wrap items-center justify-between gap-3">
             {/* Tabs */}
-            <div className="flex items-center gap-1 p-1 rounded-xl bg-slate-200/70 dark:bg-slate-900/60 border border-subtle text-xs">
+            <div className="flex items-center gap-1 p-1 rounded-xl bg-slate-100 dark:bg-slate-900/60 border border-slate-300/70 dark:border-subtle/60 text-xs">
               <button
                 type="button"
                 onClick={() => setActiveTab('all')}
                 className={`px-3 py-1 rounded-lg font-semibold transition-all ${
                   activeTab === 'all'
                     ? 'bg-accent text-white shadow-sm'
-                    : 'text-muted hover:text-main hover:bg-white/50 dark:hover:bg-white/5'
+                    : 'text-slate-700 dark:text-slate-300 hover:text-slate-950 dark:hover:text-white hover:bg-white/80 dark:hover:bg-white/10'
                 }`}
               >
                 All ({discoveredApps.length})
@@ -388,7 +388,7 @@ export const GitHubImportModal: React.FC = () => {
                 className={`px-3 py-1 rounded-lg font-semibold transition-all ${
                   activeTab === 'new'
                     ? 'bg-emerald-600 text-white shadow-sm'
-                    : 'text-muted hover:text-main hover:bg-white/50 dark:hover:bg-white/5'
+                    : 'text-slate-700 dark:text-slate-300 hover:text-slate-950 dark:hover:text-white hover:bg-white/80 dark:hover:bg-white/10'
                 }`}
               >
                 New ({newAppsCount})
@@ -399,7 +399,7 @@ export const GitHubImportModal: React.FC = () => {
                 className={`px-3 py-1 rounded-lg font-semibold transition-all ${
                   activeTab === 'in-home'
                     ? 'bg-blue-600 text-white shadow-sm'
-                    : 'text-muted hover:text-main hover:bg-white/50 dark:hover:bg-white/5'
+                    : 'text-slate-700 dark:text-slate-300 hover:text-slate-950 dark:hover:text-white hover:bg-white/80 dark:hover:bg-white/10'
                 }`}
               >
                 Already in HOME ({inHomeCount})
