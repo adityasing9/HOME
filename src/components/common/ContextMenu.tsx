@@ -54,12 +54,17 @@ export const ContextMenu: React.FC<ContextMenuProps> = ({
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') onClose();
     };
+    const handleScroll = () => {
+      onClose();
+    };
 
     window.addEventListener('mousedown', handleClickOutside);
     window.addEventListener('keydown', handleKeyDown);
+    window.addEventListener('scroll', handleScroll, { capture: true, passive: true });
     return () => {
       window.removeEventListener('mousedown', handleClickOutside);
       window.removeEventListener('keydown', handleKeyDown);
+      window.removeEventListener('scroll', handleScroll, { capture: true });
     };
   }, [onClose]);
 
@@ -272,7 +277,7 @@ export const ContextMenu: React.FC<ContextMenuProps> = ({
     <div
       ref={menuRef}
       style={{ left: `${left}px`, top: `${top}px` }}
-      className="fixed z-50 w-56 py-1.5 rounded-2xl home-panel-window border-subtle shadow-2xl text-xs font-medium text-main animate-in fade-in zoom-in-95 duration-150 backdrop-blur-2xl"
+      className="fixed z-50 w-56 py-1.5 rounded-2xl home-panel-window border-subtle shadow-2xl text-xs font-medium text-main animate-in fade-in zoom-in-95 duration-150 backdrop-blur-2xl max-h-[calc(100vh-32px)] overflow-y-auto"
     >
       {/* App Header Preview */}
       <div className="px-3 py-2 border-b border-subtle mb-1 flex items-center justify-between">
