@@ -85,10 +85,11 @@ export const PinnedApps: React.FC = () => {
   };
 
   const openButtonContextMenu = (e: React.MouseEvent, app: AppItem, index: number) => {
+    e.preventDefault();
     e.stopPropagation();
     const btn = (e.currentTarget as HTMLElement) || (e.target as HTMLElement)?.closest('button');
     const rect = btn ? btn.getBoundingClientRect() : (e.target as HTMLElement).getBoundingClientRect();
-    setContextMenuState({
+    setContextMenuState(prev => (prev?.app.id === app.id ? null : {
       app,
       anchorRect: {
         top: rect.top,
@@ -99,7 +100,7 @@ export const PinnedApps: React.FC = () => {
         height: rect.height,
       },
       index,
-    });
+    }));
   };
 
   return (
@@ -166,8 +167,13 @@ export const PinnedApps: React.FC = () => {
 
                 {/* 3-dots Context Menu button */}
                 <button
+                  type="button"
                   onClick={e => openButtonContextMenu(e, app, index)}
-                  className="absolute top-1 right-1 p-0.5 rounded-md text-muted opacity-60 sm:opacity-0 sm:group-hover:opacity-100 hover:text-main transition-all"
+                  className={`absolute top-1 right-1 p-0.5 rounded-md text-muted hover:text-main transition-all ${
+                    contextMenuState?.app.id === app.id
+                      ? 'opacity-100 text-main'
+                      : 'opacity-60 sm:opacity-0 sm:group-hover:opacity-100'
+                  }`}
                   aria-label={`Options for ${app.name}`}
                   title="More actions"
                 >

@@ -93,10 +93,11 @@ export const AllAppsView: React.FC = () => {
   };
 
   const openButtonContextMenu = (e: React.MouseEvent, app: AppItem) => {
+    e.preventDefault();
     e.stopPropagation();
     const btn = (e.currentTarget as HTMLElement) || (e.target as HTMLElement)?.closest('button');
     const rect = btn ? btn.getBoundingClientRect() : (e.target as HTMLElement).getBoundingClientRect();
-    setContextMenuState({
+    setContextMenuState(prev => (prev?.app.id === app.id ? null : {
       app,
       anchorRect: {
         top: rect.top,
@@ -106,7 +107,7 @@ export const AllAppsView: React.FC = () => {
         width: rect.width,
         height: rect.height,
       },
-    });
+    }));
   };
 
   return (
@@ -285,6 +286,7 @@ const AppRow: React.FC<AppRowProps> = ({ app, onLaunch, onContextMenu, onOpenMen
       <div className="flex items-center gap-1.5 flex-shrink-0 ml-2">
         <ExternalLink className="w-3.5 h-3.5 text-muted opacity-0 group-hover:opacity-100 transition-opacity" />
         <button
+          type="button"
           onClick={onOpenMenu}
           className="p-1 rounded-lg text-muted opacity-70 sm:opacity-0 sm:group-hover:opacity-100 hover:text-main hover-tile transition-all"
         >

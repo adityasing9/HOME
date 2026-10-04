@@ -83,10 +83,11 @@ export const RecommendedApps: React.FC = () => {
   };
 
   const openButtonMenu = (e: React.MouseEvent, app: AppItem) => {
+    e.preventDefault();
     e.stopPropagation();
     const btn = (e.currentTarget as HTMLElement) || (e.target as HTMLElement)?.closest('button');
     const rect = btn ? btn.getBoundingClientRect() : (e.target as HTMLElement).getBoundingClientRect();
-    setContextMenuState({
+    setContextMenuState(prev => (prev?.app.id === app.id ? null : {
       app,
       anchorRect: {
         top: rect.top,
@@ -96,7 +97,7 @@ export const RecommendedApps: React.FC = () => {
         width: rect.width,
         height: rect.height,
       },
-    });
+    }));
   };
 
   return (
@@ -137,8 +138,13 @@ export const RecommendedApps: React.FC = () => {
               </div>
 
               <button
+                type="button"
                 onClick={e => openButtonMenu(e, app)}
-                className="p-1 rounded-lg text-muted opacity-70 sm:opacity-0 sm:group-hover:opacity-100 hover:text-main hover-tile transition-all flex-shrink-0"
+                className={`p-1 rounded-lg text-muted hover:text-main hover-tile transition-all flex-shrink-0 ${
+                  contextMenuState?.app.id === app.id
+                    ? 'opacity-100 text-main'
+                    : 'opacity-70 sm:opacity-0 sm:group-hover:opacity-100'
+                }`}
                 aria-label="Options"
               >
                 <MoreVertical className="w-3.5 h-3.5" />
