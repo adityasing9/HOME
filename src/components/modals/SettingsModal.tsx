@@ -35,7 +35,7 @@ import {
   Lock,
   KeyRound,
   Fingerprint,
-  Smartphone,
+  Laptop,
 } from 'lucide-react';
 
 type SettingsTab =
@@ -1320,14 +1320,25 @@ export const SettingsModal: React.FC = () => {
                 </div>
 
                 {/* Phone-to-PC QR Login Explainer */}
-                <div className="p-4 rounded-2xl glass-subtle border border-subtle space-y-2">
+                <div className="p-4 rounded-2xl glass-subtle border border-emerald-500/25 bg-emerald-500/5 space-y-3">
                   <div className="flex items-center gap-2">
-                    <Smartphone className="w-4 h-4 text-accent" />
-                    <div className="text-xs font-bold text-main">Phone-to-PC QR Login</div>
+                    <Laptop className="w-4 h-4 text-emerald-500" />
+                    <div className="text-xs font-bold text-main">WhatsApp Web Style Login & PC Sync</div>
                   </div>
                   <p className="text-xs text-muted leading-relaxed">
-                    Whenever this PC is locked, it displays a dynamic QR code on the screen. Scan it with HOME on your phone using the QR Scanner (<span className="text-accent font-semibold">Backup & Restore → Scan</span>) to approve login with 1 tap. Your smartphone securely unlocks the PC and syncs your apps & settings over direct peer-to-peer WebRTC with zero servers.
+                    Link this computer with HOME on your phone to export all your installed apps, custom wallpapers, and settings over encrypted WebRTC peer-to-peer data channels with zero server storage.
                   </p>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setIsSettingsOpen(false);
+                      openQRModal('web-login');
+                    }}
+                    className="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold transition-colors shadow-sm shadow-emerald-600/20"
+                  >
+                    <Laptop className="w-3.5 h-3.5" />
+                    <span>Open HOME Web Sync</span>
+                  </button>
                 </div>
               </div>
             )}

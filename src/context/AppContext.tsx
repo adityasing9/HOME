@@ -42,11 +42,11 @@ interface AppContextType {
   unlockPC: () => void;
   isQROpen: boolean;
   setIsQROpen: (open: boolean) => void;
-  qrInitialTab: 'export' | 'scan';
-  setQRInitialTab: (tab: 'export' | 'scan') => void;
+  qrInitialTab: 'export' | 'scan' | 'web-login';
+  setQRInitialTab: (tab: 'export' | 'scan' | 'web-login') => void;
   qrTargetApp: AppItem | null;
   setQRTargetApp: (app: AppItem | null) => void;
-  openQRModal: (tab?: 'export' | 'scan', targetApp?: AppItem | null) => void;
+  openQRModal: (tab?: 'export' | 'scan' | 'web-login', targetApp?: AppItem | null) => void;
   importAppsFromQR: (newApps: AppItem[], mode: 'merge' | 'replace', newSettings?: Partial<UserSettings>) => void;
   launchApp: (app: AppItem) => void;
   addApp: (appData: Omit<AppItem, 'id' | 'createdAt' | 'launchCount' | 'lastOpenedAt' | 'pinOrder'> & { id?: string; pinOrder?: number }) => AppItem;
@@ -86,7 +86,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [isPCLocked, setIsPCLocked] = useState<boolean>(() => SecurityService.isLocked());
   const [isQROpen, setIsQROpen] = useState(false);
-  const [qrInitialTab, setQRInitialTab] = useState<'export' | 'scan'>('export');
+  const [qrInitialTab, setQRInitialTab] = useState<'export' | 'scan' | 'web-login'>('web-login');
   const [qrTargetApp, setQRTargetApp] = useState<AppItem | null>(null);
   const [toasts, setToasts] = useState<ToastMessage[]>([]);
   const [isOnline, setIsOnline] = useState<boolean>(navigator.onLine);
@@ -295,7 +295,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     setIsPCLocked(false);
   }, []);
 
-  const openQRModal = useCallback((tab: 'export' | 'scan' = 'export', targetApp: AppItem | null = null) => {
+  const openQRModal = useCallback((tab: 'export' | 'scan' | 'web-login' = 'web-login', targetApp: AppItem | null = null) => {
     setQRInitialTab(tab);
     setQRTargetApp(targetApp);
     setIsQROpen(true);

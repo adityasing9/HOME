@@ -392,15 +392,23 @@ export const PCLockScreen: React.FC = () => {
         {loginMethod === 'qr-phone' && (
           <div className="w-full flex flex-col items-center space-y-3 animate-in fade-in duration-200">
             {authSuccessData ? (
-              <div className="p-4 rounded-2xl bg-emerald-500/20 border border-emerald-500/40 text-center space-y-2 animate-in zoom-in-95">
-                <div className="w-10 h-10 rounded-full bg-emerald-500 text-white mx-auto flex items-center justify-center">
-                  <Check className="w-5 h-5" />
+              <div className="p-5 rounded-3xl bg-emerald-500/15 border border-emerald-500/30 text-center space-y-3 animate-in zoom-in-95 max-w-xs w-full">
+                <div className="w-12 h-12 rounded-2xl bg-emerald-500 text-white mx-auto flex items-center justify-center shadow-lg shadow-emerald-500/30">
+                  <Check className="w-6 h-6" />
                 </div>
-                <div className="text-sm font-bold text-emerald-400">
-                  Phone Authenticated!
+                <div>
+                  <div className="text-sm font-bold text-emerald-400">
+                    Phone Synchronized!
+                  </div>
+                  <div className="text-xs text-slate-300 mt-0.5">
+                    Exported {authSuccessData.apps?.length || 0} apps & preferences
+                  </div>
                 </div>
-                <div className="text-xs text-slate-300">
-                  Logging in as {authSuccessData.userName || profile.userName}...
+                <div className="w-full h-1.5 rounded-full bg-white/10 overflow-hidden">
+                  <div className="h-full bg-emerald-500 animate-pulse w-full" />
+                </div>
+                <div className="text-[11px] text-slate-400">
+                  Launching desktop as {authSuccessData.userName || profile.userName}...
                 </div>
               </div>
             ) : isConnectingPeer ? (

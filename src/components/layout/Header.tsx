@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useApp } from '../../context/AppContext';
-import { Settings, Download, WifiOff, Sun, Moon, QrCode, Lock } from 'lucide-react';
+import { Settings, Download, WifiOff, Sun, Moon, QrCode, Lock, Laptop } from 'lucide-react';
 
 export const Header: React.FC = () => {
   const {
@@ -121,6 +121,17 @@ export const Header: React.FC = () => {
           ) : (
             <Moon className="w-4 h-4 text-indigo-500" />
           )}
+        </button>
+
+        {/* HOME Web - WhatsApp Web Login & Export to PC */}
+        <button
+          onClick={() => openQRModal('web-login')}
+          className="flex items-center gap-1.5 px-2 py-1.5 sm:px-2.5 sm:py-2 rounded-xl glass-subtle border-subtle text-muted hover:text-main hover-tile transition-all shadow-sm group"
+          title="HOME Web — WhatsApp Web Style Login & PC Sync"
+          aria-label="Link PC"
+        >
+          <Laptop className="w-4 h-4 text-emerald-500 group-hover:scale-110 transition-transform" />
+          <span className="hidden sm:inline text-xs font-semibold text-main">Link PC</span>
         </button>
 
         {/* QR Code Sync & Scanner */}
