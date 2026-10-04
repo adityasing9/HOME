@@ -8,14 +8,26 @@ export class AppRepository {
   /**
    * Check if domain belongs to a staging, dev, or local environment where Google favicons will 404
    */
-  static isStagingOrDevDomain(domain: string): boolean {
-    const d = domain.toLowerCase();
+  static isStagingOrDevDomain(domainOrUrl: string): boolean {
+    const d = domainOrUrl.toLowerCase();
     return (
+      d.includes('.github.io') ||
+      d.includes('.gitlab.io') ||
+      d.includes('.pages.dev') ||
       d.includes('.onrender.com') ||
       d.includes('.vercel.app') ||
       d.includes('.netlify.app') ||
       d.includes('.railway.app') ||
       d.includes('.fly.dev') ||
+      d.includes('.surge.sh') ||
+      d.includes('.web.app') ||
+      d.includes('.firebaseapp.com') ||
+      d.includes('.azurewebsites.net') ||
+      d.includes('.herokuapp.com') ||
+      d.includes('.amplifyapp.com') ||
+      d.includes('.glitch.me') ||
+      d.includes('.replit.app') ||
+      d.includes('.repl.co') ||
       d.includes('localhost') ||
       d.endsWith('.local') ||
       d.endsWith('.internal')
@@ -66,10 +78,15 @@ export class AppRepository {
           modified = true;
           return { ...app, icon: undefined, iconType: 'letter' as const };
         }
-        // If pointing to a dev/staging domain on Google Favicon resolver
+        // If pointing to a dev/staging domain on Google Favicon resolver or if app.url is a dev host
         if (app.icon.includes('google.com/s2/favicons') || app.icon.includes('gstatic.com/faviconV2')) {
           const match = app.icon.match(/domain=([^&]+)/) || app.icon.match(/url=([^&]+)/);
-          if (match && this.isStagingOrDevDomain(decodeURIComponent(match[1]))) {
+          const domainTarget = match ? decodeURIComponent(match[1]) : '';
+          if (
+            this.isStagingOrDevDomain(app.url) ||
+            this.isStagingOrDevDomain(app.icon) ||
+            (domainTarget && this.isStagingOrDevDomain(domainTarget))
+          ) {
             modified = true;
             failedIcons.add(app.icon);
             return { ...app, icon: undefined, iconType: 'letter' as const };

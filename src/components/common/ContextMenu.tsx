@@ -76,13 +76,13 @@ export const ContextMenu: React.FC<ContextMenuProps> = ({
         {/* Bottom sheet content */}
         <div
           ref={menuRef}
-          className="relative z-10 w-full max-w-lg mx-auto rounded-t-[28px] home-panel-window border-t border-subtle shadow-2xl p-4 pb-[max(24px,env(safe-area-inset-bottom))] animate-in slide-in-from-bottom duration-200 backdrop-blur-2xl"
+          className="relative z-10 w-full max-w-lg mx-auto rounded-t-[28px] home-panel-window border-t border-subtle shadow-2xl p-4 max-h-[85vh] flex flex-col pb-[max(16px,env(safe-area-inset-bottom))] animate-in slide-in-from-bottom duration-200 backdrop-blur-2xl"
         >
           {/* Grab handle */}
-          <div className="w-10 h-1 bg-white/30 dark:bg-white/20 rounded-full mx-auto mb-3" />
+          <div className="w-10 h-1 bg-white/30 dark:bg-white/20 rounded-full mx-auto mb-3 flex-shrink-0" />
 
           {/* App Info Header */}
-          <div className="flex items-center gap-3 pb-3 mb-2 border-b border-subtle">
+          <div className="flex items-center gap-3 pb-3 mb-2 border-b border-subtle flex-shrink-0">
             <AppIcon app={app} size="md" />
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2">
@@ -98,7 +98,7 @@ export const ContextMenu: React.FC<ContextMenuProps> = ({
           </div>
 
           {/* Action List */}
-          <div className="flex flex-col gap-1 text-sm font-medium">
+          <div className="flex-1 overflow-y-auto min-h-0 flex flex-col gap-1 text-sm font-medium pr-0.5">
             <button
               onClick={() => {
                 launchApp(app);
@@ -239,7 +239,7 @@ export const ContextMenu: React.FC<ContextMenuProps> = ({
           {/* Close button */}
           <button
             onClick={onClose}
-            className="w-full mt-3 py-2.5 rounded-xl bg-black/5 dark:bg-white/10 text-main font-semibold text-xs hover-tile transition-colors"
+            className="w-full mt-2.5 py-2.5 rounded-xl bg-black/5 dark:bg-white/10 text-main font-semibold text-xs hover-tile transition-colors flex-shrink-0"
           >
             Cancel
           </button>
