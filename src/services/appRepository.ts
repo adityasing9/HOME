@@ -197,6 +197,42 @@ export class AppRepository {
     return newApp;
   }
 
+  static addMultipleApps(
+    newApps: Array<Omit<AppItem, 'id' | 'createdAt' | 'launchCount' | 'lastOpenedAt' | 'pinOrder'> & { id?: string; pinOrder?: number }>
+  ): AppItem[] {
+    if (!newApps.length) return [];
+    const apps = this.getApps();
+
+    const pinnedCount = newApps.filter(a => a.pinned).length;
+
+    // Shift existing pinned apps up by the number of new pinned apps
+    const shiftedApps = apps.map(existing => {
+      if (existing.pinned) {
+        return { ...existing, pinOrder: (existing.pinOrder ?? 0) + pinnedCount };
+      }
+      return existing;
+    });
+
+    let currentPinOrder = 0;
+    const now = Date.now();
+    const createdApps: AppItem[] = newApps.map((app, index) => {
+      const newId = app.id || `app-${now}-${index}-${Math.random().toString(36).substring(2, 6)}`;
+      const assignedPinOrder = app.pinned ? currentPinOrder++ : 9999;
+      return {
+        ...app,
+        id: newId,
+        createdAt: now + index,
+        launchCount: 0,
+        lastOpenedAt: null,
+        pinOrder: assignedPinOrder,
+      };
+    });
+
+    const updated = [...createdApps, ...shiftedApps];
+    this.saveApps(updated);
+    return createdApps;
+  }
+
   static updateApp(id: string, updates: Partial<AppItem>): AppItem | null {
     const apps = this.getApps();
     const index = apps.findIndex(a => a.id === id);
@@ -222,6 +258,18 @@ export class AppRepository {
   static deleteApp(id: string): boolean {
     const apps = this.getApps();
     const filtered = apps.filter(a => a.id !== id);
+    if (filtered.length !== apps.length) {
+      this.saveApps(filtered);
+      return true;
+    }
+    return false;
+  }
+
+  static deleteApps(ids: string[]): boolean {
+    if (!ids || ids.length === 0) return false;
+    const idSet = new Set(ids);
+    const apps = this.getApps();
+    const filtered = apps.filter(a => !idSet.has(a.id));
     if (filtered.length !== apps.length) {
       this.saveApps(filtered);
       return true;

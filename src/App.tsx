@@ -9,6 +9,7 @@ import { AddAppModal } from './components/modals/AddAppModal';
 import { EditAppModal } from './components/modals/EditAppModal';
 import { SettingsModal } from './components/modals/SettingsModal';
 import { FirstRunModal } from './components/modals/FirstRunModal';
+import { GitHubImportModal } from './components/modals/GitHubImportModal';
 import { ToastContainer } from './components/common/ToastContainer';
 
 const MainShell: React.FC = () => {
@@ -90,6 +91,7 @@ const MainShell: React.FC = () => {
       <EditAppModal />
       <SettingsModal />
       <FirstRunModal />
+      <GitHubImportModal />
 
       {/* Toast Notification Container */}
       <ToastContainer />

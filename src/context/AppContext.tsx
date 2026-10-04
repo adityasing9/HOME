@@ -29,14 +29,18 @@ interface AppContextType {
   setAllAppsViewMode: (mode: 'grid' | 'list') => void;
   isAddAppOpen: boolean;
   setIsAddAppOpen: (open: boolean) => void;
+  isGitHubImportOpen: boolean;
+  setIsGitHubImportOpen: (open: boolean) => void;
   editingApp: AppItem | null;
   setEditingApp: (app: AppItem | null) => void;
   isSettingsOpen: boolean;
   setIsSettingsOpen: (open: boolean) => void;
   launchApp: (app: AppItem) => void;
   addApp: (appData: Omit<AppItem, 'id' | 'createdAt' | 'launchCount' | 'lastOpenedAt' | 'pinOrder'> & { id?: string; pinOrder?: number }) => AppItem;
+  addMultipleApps: (appsData: Array<Omit<AppItem, 'id' | 'createdAt' | 'launchCount' | 'lastOpenedAt' | 'pinOrder'> & { id?: string; pinOrder?: number }>) => AppItem[];
   updateApp: (id: string, updates: Partial<AppItem>) => void;
   deleteApp: (id: string) => void;
+  deleteApps: (ids: string[]) => void;
   togglePin: (id: string) => void;
   toggleFavorite: (id: string) => void;
   reorderPinned: (orderedIds: string[]) => void;
@@ -64,6 +68,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [allAppsSort, setAllAppsSort] = useState<SortOption>(settings.defaultSort || 'name-asc');
   const [allAppsViewMode, setAllAppsViewMode] = useState<'grid' | 'list'>('grid');
   const [isAddAppOpen, setIsAddAppOpen] = useState(false);
+  const [isGitHubImportOpen, setIsGitHubImportOpen] = useState(false);
   const [editingApp, setEditingApp] = useState<AppItem | null>(null);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [toasts, setToasts] = useState<ToastMessage[]>([]);
@@ -168,6 +173,13 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     return newApp;
   }, [refreshApps, showToast]);
 
+  const addMultipleApps = useCallback((appsData: Array<Omit<AppItem, 'id' | 'createdAt' | 'launchCount' | 'lastOpenedAt' | 'pinOrder'> & { id?: string; pinOrder?: number }>) => {
+    const created = AppRepository.addMultipleApps(appsData);
+    refreshApps();
+    showToast(`Imported ${created.length} app(s) to HOME`, 'success');
+    return created;
+  }, [refreshApps, showToast]);
+
   const updateApp = useCallback((id: string, updates: Partial<AppItem>) => {
     const updated = AppRepository.updateApp(id, updates);
     refreshApps();
@@ -184,6 +196,16 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       showToast(`Removed "${target.name}" from HOME`, 'info');
     }
   }, [apps, refreshApps, showToast]);
+
+  const deleteApps = useCallback((ids: string[]) => {
+    if (!ids || ids.length === 0) return;
+    const count = ids.length;
+    const success = AppRepository.deleteApps(ids);
+    refreshApps();
+    if (success) {
+      showToast(`Deleted ${count} application(s) from HOME`, 'info');
+    }
+  }, [refreshApps, showToast]);
 
   const togglePin = useCallback((id: string) => {
     const updated = AppRepository.togglePin(id);
@@ -259,6 +281,10 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
       // Escape -> close open modals or back to home
       if (e.key === 'Escape') {
+        if (isGitHubImportOpen) {
+          setIsGitHubImportOpen(false);
+          return;
+        }
         if (isAddAppOpen) {
           setIsAddAppOpen(false);
           return;
@@ -289,7 +315,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isAddAppOpen, editingApp, isSettingsOpen, searchQuery, activeView]);
+  }, [isAddAppOpen, isGitHubImportOpen, editingApp, isSettingsOpen, searchQuery, activeView]);
 
   const value = useMemo<AppContextType>(() => ({
     apps,
@@ -306,14 +332,18 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     setAllAppsViewMode,
     isAddAppOpen,
     setIsAddAppOpen,
+    isGitHubImportOpen,
+    setIsGitHubImportOpen,
     editingApp,
     setEditingApp,
     isSettingsOpen,
     setIsSettingsOpen,
     launchApp,
     addApp,
+    addMultipleApps,
     updateApp,
     deleteApp,
+    deleteApps,
     togglePin,
     toggleFavorite,
     reorderPinned,
@@ -337,12 +367,15 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     allAppsSort,
     allAppsViewMode,
     isAddAppOpen,
+    isGitHubImportOpen,
     editingApp,
     isSettingsOpen,
     launchApp,
     addApp,
+    addMultipleApps,
     updateApp,
     deleteApp,
+    deleteApps,
     togglePin,
     toggleFavorite,
     reorderPinned,
