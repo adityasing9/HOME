@@ -3,6 +3,7 @@ import { useApp } from '../../context/AppContext';
 import { QRService, type ParsedQRResult } from '../../services/qrService';
 import type { AppItem } from '../../types';
 import { AppIcon } from '../common/AppIcon';
+import { PeerAuthService } from '../../services/peerAuthService';
 import {
   X,
   QrCode,
@@ -16,6 +17,7 @@ import {
   Flashlight,
   FlipHorizontal,
   AlertCircle,
+  Monitor,
 } from 'lucide-react';
 
 export const QRModal: React.FC = () => {
@@ -356,6 +358,34 @@ export const QRModal: React.FC = () => {
     setScannedResult(null);
   };
 
+  const [isAuthorizingPC, setIsAuthorizingPC] = useState<boolean>(false);
+
+  const handleAuthorizePCLogin = async () => {
+    if (!scannedResult || !scannedResult.sessionId) return;
+    setIsAuthorizingPC(true);
+    try {
+      const success = await PeerAuthService.sendLoginFromPhone(scannedResult.sessionId, {
+        token: `phone_token_${Date.now()}`,
+        userName: settings.userName || 'Aditya Singh',
+        avatar: '👤',
+        apps,
+        settings,
+      });
+
+      if (success) {
+        showToast('Logged into PC successfully!', 'success');
+        setIsQROpen(false);
+        setScannedResult(null);
+      } else {
+        showToast('Could not establish connection to PC. Ensure PC is on the login screen.', 'error');
+      }
+    } catch {
+      showToast('Error authorizing PC login.', 'error');
+    } finally {
+      setIsAuthorizingPC(false);
+    }
+  };
+
   // Copy share URL to clipboard
   const handleCopyLink = () => {
     if (!shareUrl) return;
@@ -476,24 +506,85 @@ export const QRModal: React.FC = () => {
               ======================================================== */}
           {scannedResult ? (
             <div className="space-y-4 animate-in fade-in duration-200">
-              {/* Success Banner */}
-              <div className="flex items-center gap-3 p-3.5 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-600 dark:text-emerald-400">
-                <div className="p-2 rounded-xl bg-emerald-500 text-white">
-                  <Check className="w-4 h-4" />
-                </div>
-                <div className="text-xs">
-                  <div className="font-bold text-sm">
-                    {scannedResult.type === 'single-app'
-                      ? 'Single App Found'
-                      : `${scannedResult.apps?.length || 0} Apps Found in QR`}
+              {scannedResult.type === 'pc-login' ? (
+                /* --- PC Login Authorization Card --- */
+                <div className="p-5 rounded-3xl glass-subtle border border-accent/40 bg-accent-light/30 text-center space-y-4 animate-in zoom-in-95">
+                  <div className="w-14 h-14 rounded-2xl bg-accent text-white mx-auto flex items-center justify-center shadow-xl shadow-accent/30">
+                    <Monitor className="w-7 h-7" />
                   </div>
-                  <div className="text-muted text-[11px] mt-0.5">
-                    {scannedResult.settings
-                      ? 'Includes custom theme and launcher layout'
-                      : 'Ready to import into your launcher'}
+                  <div>
+                    <h3 className="text-base font-bold text-main">PC Login Request Detected</h3>
+                    <p className="text-xs text-muted mt-1 max-w-sm mx-auto">
+                      A desktop browser is requesting to sign in and pair with your HOME launcher.
+                    </p>
+                  </div>
+
+                  <div className="p-3.5 rounded-2xl glass-subtle border-subtle text-xs text-left space-y-1.5 bg-black/[0.03] dark:bg-white/[0.04]">
+                    <div className="flex justify-between">
+                      <span className="text-muted">Account:</span>
+                      <span className="font-semibold text-main">{settings.userName || 'Aditya Singh'}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-muted">Applications to sync:</span>
+                      <span className="font-semibold text-main">{apps.length} applications</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-muted">Target PC Session:</span>
+                      <span className="font-mono text-[11px] text-accent truncate max-w-[170px]">
+                        {scannedResult.sessionId}
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-2 pt-1">
+                    <button
+                      type="button"
+                      onClick={() => setScannedResult(null)}
+                      className="flex-1 py-2.5 rounded-xl glass-subtle border-subtle text-xs text-muted hover:text-main font-semibold transition-colors"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      type="button"
+                      onClick={handleAuthorizePCLogin}
+                      disabled={isAuthorizingPC}
+                      className="flex-1 py-2.5 rounded-xl bg-accent text-white text-xs font-bold hover:bg-accent-hover shadow-lg shadow-accent/25 flex items-center justify-center gap-2 transition-all disabled:opacity-50"
+                    >
+                      {isAuthorizingPC ? (
+                        <>
+                          <RefreshCw className="w-4 h-4 animate-spin" />
+                          <span>Authorizing PC...</span>
+                        </>
+                      ) : (
+                        <>
+                          <Check className="w-4 h-4" />
+                          <span>Authorize PC Login</span>
+                        </>
+                      )}
+                    </button>
                   </div>
                 </div>
-              </div>
+              ) : (
+                /* --- Regular App / Setup Import --- */
+                <>
+                  {/* Success Banner */}
+                  <div className="flex items-center gap-3 p-3.5 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-600 dark:text-emerald-400">
+                    <div className="p-2 rounded-xl bg-emerald-500 text-white">
+                      <Check className="w-4 h-4" />
+                    </div>
+                    <div className="text-xs">
+                      <div className="font-bold text-sm">
+                        {scannedResult.type === 'single-app'
+                          ? 'Single App Found'
+                          : `${scannedResult.apps?.length || 0} Apps Found in QR`}
+                      </div>
+                      <div className="text-muted text-[11px] mt-0.5">
+                        {scannedResult.settings
+                          ? 'Includes custom theme and launcher layout'
+                          : 'Ready to import into your launcher'}
+                      </div>
+                    </div>
+                  </div>
 
               {/* Import Mode Selection */}
               {scannedResult.apps && scannedResult.apps.length > 1 && (
@@ -607,8 +698,10 @@ export const QRModal: React.FC = () => {
                   </span>
                 </button>
               </div>
-            </div>
-          ) : activeTab === 'export' ? (
+            </>
+          )}
+        </div>
+      ) : activeTab === 'export' ? (
             /* ========================================================
                VIEW 2: EXPORT QR CODE
                ======================================================== */

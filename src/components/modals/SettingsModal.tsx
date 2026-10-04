@@ -12,6 +12,7 @@ import { SettingsRepository } from '../../services/settingsRepository';
 import { BackupService } from '../../services/backupService';
 import { AppRepository } from '../../services/appRepository';
 import { PwaDetectionService } from '../../services/pwaDetectionService';
+import { SecurityService, type SecurityProfile } from '../../services/securityService';
 import {
   X,
   Palette,
@@ -31,6 +32,10 @@ import {
   Loader2,
   QrCode,
   Camera,
+  Lock,
+  KeyRound,
+  Fingerprint,
+  Smartphone,
 } from 'lucide-react';
 
 type SettingsTab =
@@ -40,6 +45,7 @@ type SettingsTab =
   | 'privacy'
   | 'storage'
   | 'shortcuts'
+  | 'security'
   | 'backup'
   | 'about';
 
@@ -49,6 +55,7 @@ export const SettingsModal: React.FC = () => {
     setIsSettingsOpen,
     setIsGitHubImportOpen,
     openQRModal,
+    lockPC,
     apps,
     settings,
     updateSettings,
@@ -62,6 +69,96 @@ export const SettingsModal: React.FC = () => {
   const [activeTab, setActiveTab] = useState<SettingsTab>('appearance');
   const [showResetConfirm, setShowResetConfirm] = useState(false);
   const [storageInfo, setStorageInfo] = useState(() => SettingsRepository.getStorageBreakdown());
+
+  // Security & PC Login state
+  const [secProfile, setSecProfile] = useState<SecurityProfile>(() => SecurityService.getProfile());
+  const [pinDialogMode, setPinDialogMode] = useState<'none' | 'set' | 'change' | 'remove'>('none');
+  const [userNameInput, setUserNameInput] = useState<string>(() => SecurityService.getProfile().userName);
+  const [avatarInput, setAvatarInput] = useState<string>(() => SecurityService.getProfile().avatar);
+  const [newPinValue, setNewPinValue] = useState<string>('');
+  const [confirmPinValue, setConfirmPinValue] = useState<string>('');
+  const [currentPinValue, setCurrentPinValue] = useState<string>('');
+  const [pinDialogError, setPinDialogError] = useState<string | null>(null);
+  const [isBiometricBusy, setIsBiometricBusy] = useState(false);
+
+  const handleSavePin = async () => {
+    setPinDialogError(null);
+    if (pinDialogMode === 'change') {
+      const isCurrentValid = await SecurityService.verifyPin(currentPinValue);
+      if (!isCurrentValid) {
+        setPinDialogError('Current PIN is incorrect');
+        return;
+      }
+    }
+    if (!newPinValue || newPinValue.length < 4) {
+      setPinDialogError('PIN must be at least 4 digits');
+      return;
+    }
+    if (newPinValue !== confirmPinValue) {
+      setPinDialogError('PIN confirmation does not match');
+      return;
+    }
+    await SecurityService.setPin(newPinValue);
+    setSecProfile(SecurityService.getProfile());
+    setPinDialogMode('none');
+    setNewPinValue('');
+    setConfirmPinValue('');
+    setCurrentPinValue('');
+    showToast('PIN successfully updated', 'success');
+  };
+
+  const handleRemovePin = async () => {
+    setPinDialogError(null);
+    if (secProfile.hasPin) {
+      const isCurrentValid = await SecurityService.verifyPin(currentPinValue);
+      if (!isCurrentValid) {
+        setPinDialogError('Current PIN is incorrect');
+        return;
+      }
+    }
+    await SecurityService.setPin(null);
+    setSecProfile(SecurityService.getProfile());
+    setPinDialogMode('none');
+    setCurrentPinValue('');
+    showToast('PIN protection removed', 'info');
+  };
+
+  const handleRegisterBiometric = async () => {
+    setIsBiometricBusy(true);
+    try {
+      const success = await SecurityService.registerBiometric();
+      if (success) {
+        setSecProfile(SecurityService.getProfile());
+        showToast('Windows Hello / Biometric registered successfully!', 'success');
+      } else {
+        showToast('Biometric setup was cancelled or unsupported on this device', 'error');
+      }
+    } catch {
+      showToast('Biometric setup failed', 'error');
+    } finally {
+      setIsBiometricBusy(false);
+    }
+  };
+
+  const handleRemoveBiometric = () => {
+    SecurityService.saveProfile({
+      biometricEnabled: false,
+      biometricCredentialId: null,
+    });
+    setSecProfile(SecurityService.getProfile());
+    showToast('Biometric authentication removed', 'info');
+  };
+
+  const handleSaveProfileInfo = () => {
+    const trimmed = userNameInput.trim() || 'Aditya Singh';
+    const updated = SecurityService.saveProfile({
+      userName: trimmed,
+      avatar: avatarInput,
+    });
+    updateSettings({ userName: trimmed });
+    setSecProfile(updated);
+    showToast('Profile info saved', 'success');
+  };
 
   // Batch PWA logo upgrade states
   const [isBatchScanning, setIsBatchScanning] = useState(false);
@@ -297,6 +394,15 @@ export const SettingsModal: React.FC = () => {
               onClick={() => setActiveTab('shortcuts')}
               icon={<Keyboard className="w-4 h-4" />}
               label="Shortcuts"
+            />
+            <TabButton
+              active={activeTab === 'security'}
+              onClick={() => {
+                setSecProfile(SecurityService.getProfile());
+                setActiveTab('security');
+              }}
+              icon={<Lock className="w-4 h-4" />}
+              label="Security & PC Login"
             />
             <TabButton
               active={activeTab === 'backup'}
@@ -855,8 +961,373 @@ export const SettingsModal: React.FC = () => {
                   <ShortcutRow keys={['Ctrl / ⌘', 'K']} desc="Focus search and command bar" />
                   <ShortcutRow keys={['Esc']} desc="Clear search, close dialogs, return home" />
                   <ShortcutRow keys={['Ctrl / ⌘', ',']} desc="Open HOME settings" />
+                  <ShortcutRow keys={['Ctrl / ⌘', 'L']} desc="Lock PC and display Login Screen" />
                   <ShortcutRow keys={['↓', '↑']} desc="Navigate dynamic search results" />
                   <ShortcutRow keys={['Enter ↵']} desc="Launch selected search result" />
+                </div>
+              </div>
+            )}
+
+            {/* 7. SECURITY & PC LOGIN TAB */}
+            {activeTab === 'security' && (
+              <div className="space-y-5">
+                {/* Instant Lock Banner */}
+                <div className="p-4 rounded-2xl glass-subtle border border-accent/30 bg-accent-light/20 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-2xl bg-accent text-white flex items-center justify-center shadow-md shadow-accent/20 flex-shrink-0">
+                      <Lock className="w-5 h-5" />
+                    </div>
+                    <div>
+                      <h4 className="text-xs font-bold text-main">PC Lock Screen & Security</h4>
+                      <p className="text-[11px] text-muted">
+                        Lock your HOME screen anytime with <kbd className="px-1.5 py-0.5 rounded bg-black/10 dark:bg-white/10 font-mono text-[10px] text-main">Ctrl + L</kbd> or the top bar lock icon.
+                      </p>
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setIsSettingsOpen(false);
+                      lockPC();
+                    }}
+                    className="flex items-center justify-center gap-1.5 px-4 py-2 rounded-xl bg-accent text-white text-xs font-bold hover:bg-accent-hover transition-colors shadow-sm whitespace-nowrap"
+                  >
+                    <Lock className="w-3.5 h-3.5" />
+                    <span>Lock PC Screen Now</span>
+                  </button>
+                </div>
+
+                {/* Profile Identity Card */}
+                <div className="p-4 rounded-2xl glass-subtle border-subtle space-y-3">
+                  <div className="flex items-center justify-between">
+                    <div className="text-xs font-bold text-main">User Profile & Identity</div>
+                    <span className="text-[10px] text-muted">Shown on lock screen</span>
+                  </div>
+
+                  <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center">
+                    <div className="flex items-center gap-2">
+                      <div className="w-12 h-12 rounded-2xl glass-subtle border-subtle flex items-center justify-center text-2xl shadow-inner select-none flex-shrink-0">
+                        {avatarInput || '👤'}
+                      </div>
+                      <div className="flex flex-wrap gap-1 max-w-[170px]">
+                        {['👤', '💻', '⚡', '🚀', '🛡️', '🐱', '🦊', '✨'].map(emoji => (
+                          <button
+                            key={emoji}
+                            type="button"
+                            onClick={() => {
+                              setAvatarInput(emoji);
+                              const updated = SecurityService.saveProfile({ avatar: emoji });
+                              setSecProfile(updated);
+                            }}
+                            className={`w-7 h-7 rounded-lg text-sm flex items-center justify-center transition-all ${
+                              avatarInput === emoji
+                                ? 'bg-accent text-white scale-110'
+                                : 'glass-subtle hover-tile'
+                            }`}
+                          >
+                            {emoji}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div className="flex-1 w-full flex items-center gap-2">
+                      <input
+                        type="text"
+                        value={userNameInput}
+                        onChange={e => setUserNameInput(e.target.value)}
+                        onBlur={handleSaveProfileInfo}
+                        placeholder="Your Name / PC Name"
+                        className="flex-1 px-3 py-2 rounded-xl glass-subtle border border-subtle text-xs text-main placeholder:text-muted focus:outline-none focus:border-accent"
+                      />
+                      <button
+                        type="button"
+                        onClick={handleSaveProfileInfo}
+                        className="px-3 py-2 rounded-xl glass-subtle hover-tile border border-subtle text-xs font-semibold text-main transition-colors"
+                      >
+                        Save
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                {/* PIN Code Security Card */}
+                <div className="p-4 rounded-2xl glass-subtle border-subtle space-y-3">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <KeyRound className="w-4 h-4 text-accent" />
+                      <div className="text-xs font-bold text-main">PIN Protection</div>
+                    </div>
+                    {secProfile.hasPin ? (
+                      <span className="px-2.5 py-0.5 rounded-full bg-emerald-500/10 text-emerald-500 border border-emerald-500/20 text-[10px] font-bold">
+                        PIN Active (••••)
+                      </span>
+                    ) : (
+                      <span className="px-2.5 py-0.5 rounded-full bg-amber-500/10 text-amber-500 border border-amber-500/20 text-[10px] font-bold">
+                        No PIN Set (Open Access)
+                      </span>
+                    )}
+                  </div>
+
+                  <p className="text-xs text-muted">
+                    Secure your launcher with a 4 to 6 digit numerical PIN stored locally using SHA-256 encryption.
+                  </p>
+
+                  {/* Inline PIN Dialog / Form */}
+                  {pinDialogMode !== 'none' ? (
+                    <div className="p-3.5 rounded-xl border border-accent/30 bg-accent-light/10 space-y-3 animate-in fade-in">
+                      <div className="text-xs font-bold text-main">
+                        {pinDialogMode === 'set' && 'Set New PIN'}
+                        {pinDialogMode === 'change' && 'Change Security PIN'}
+                        {pinDialogMode === 'remove' && 'Remove PIN Protection'}
+                      </div>
+
+                      {pinDialogError && (
+                        <div className="text-xs text-rose-500 font-medium">{pinDialogError}</div>
+                      )}
+
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                        {(pinDialogMode === 'change' || pinDialogMode === 'remove') && (
+                          <div className="sm:col-span-2">
+                            <label className="text-[10px] text-muted block mb-1">Current PIN</label>
+                            <input
+                              type="password"
+                              inputMode="numeric"
+                              maxLength={6}
+                              value={currentPinValue}
+                              onChange={e => setCurrentPinValue(e.target.value.replace(/\D/g, ''))}
+                              placeholder="••••"
+                              className="w-full px-3 py-1.5 rounded-xl glass-subtle border border-subtle text-xs text-main tracking-widest focus:outline-none focus:border-accent"
+                            />
+                          </div>
+                        )}
+
+                        {pinDialogMode !== 'remove' && (
+                          <>
+                            <div>
+                              <label className="text-[10px] text-muted block mb-1">New PIN (4-6 digits)</label>
+                              <input
+                                type="password"
+                                inputMode="numeric"
+                                maxLength={6}
+                                value={newPinValue}
+                                onChange={e => setNewPinValue(e.target.value.replace(/\D/g, ''))}
+                                placeholder="••••"
+                                className="w-full px-3 py-1.5 rounded-xl glass-subtle border border-subtle text-xs text-main tracking-widest focus:outline-none focus:border-accent"
+                              />
+                            </div>
+                            <div>
+                              <label className="text-[10px] text-muted block mb-1">Confirm New PIN</label>
+                              <input
+                                type="password"
+                                inputMode="numeric"
+                                maxLength={6}
+                                value={confirmPinValue}
+                                onChange={e => setConfirmPinValue(e.target.value.replace(/\D/g, ''))}
+                                placeholder="••••"
+                                className="w-full px-3 py-1.5 rounded-xl glass-subtle border border-subtle text-xs text-main tracking-widest focus:outline-none focus:border-accent"
+                              />
+                            </div>
+                          </>
+                        )}
+                      </div>
+
+                      <div className="flex items-center gap-2 pt-1">
+                        {pinDialogMode === 'remove' ? (
+                          <button
+                            type="button"
+                            onClick={handleRemovePin}
+                            className="px-3.5 py-1.5 rounded-xl bg-rose-600 hover:bg-rose-500 text-white text-xs font-bold transition-colors"
+                          >
+                            Confirm Remove PIN
+                          </button>
+                        ) : (
+                          <button
+                            type="button"
+                            onClick={handleSavePin}
+                            className="px-3.5 py-1.5 rounded-xl bg-accent hover:bg-accent-hover text-white text-xs font-bold transition-colors"
+                          >
+                            Save PIN
+                          </button>
+                        )}
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setPinDialogMode('none');
+                            setPinDialogError(null);
+                            setCurrentPinValue('');
+                            setNewPinValue('');
+                            setConfirmPinValue('');
+                          }}
+                          className="px-3 py-1.5 rounded-xl glass-subtle hover-tile border border-subtle text-xs font-semibold text-main transition-colors"
+                        >
+                          Cancel
+                        </button>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="flex items-center gap-2 pt-1">
+                      {secProfile.hasPin ? (
+                        <>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setPinDialogMode('change');
+                              setPinDialogError(null);
+                              setCurrentPinValue('');
+                              setNewPinValue('');
+                              setConfirmPinValue('');
+                            }}
+                            className="px-3 py-1.5 rounded-xl glass-subtle hover-tile border border-subtle text-xs font-bold text-main transition-colors"
+                          >
+                            Change PIN
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setPinDialogMode('remove');
+                              setPinDialogError(null);
+                              setCurrentPinValue('');
+                            }}
+                            className="px-3 py-1.5 rounded-xl glass-subtle hover:bg-rose-500/10 border border-subtle text-xs font-semibold text-rose-500 transition-colors"
+                          >
+                            Remove PIN
+                          </button>
+                        </>
+                      ) : (
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setPinDialogMode('set');
+                            setPinDialogError(null);
+                            setNewPinValue('');
+                            setConfirmPinValue('');
+                          }}
+                          className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-accent text-white text-xs font-bold hover:bg-accent-hover transition-colors shadow-sm"
+                        >
+                          <KeyRound className="w-3.5 h-3.5" />
+                          <span>Set Security PIN</span>
+                        </button>
+                      )}
+                    </div>
+                  )}
+                </div>
+
+                {/* Windows Hello / Biometric Auth Card */}
+                <div className="p-4 rounded-2xl glass-subtle border-subtle space-y-3">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <Fingerprint className="w-4 h-4 text-accent" />
+                      <div className="text-xs font-bold text-main">Windows Hello & Biometrics</div>
+                    </div>
+                    {secProfile.biometricEnabled ? (
+                      <span className="px-2.5 py-0.5 rounded-full bg-emerald-500/10 text-emerald-500 border border-emerald-500/20 text-[10px] font-bold">
+                        Biometric Key Ready
+                      </span>
+                    ) : (
+                      <span className="px-2.5 py-0.5 rounded-full bg-black/10 dark:bg-white/10 text-muted border border-subtle text-[10px] font-bold">
+                        Not Registered
+                      </span>
+                    )}
+                  </div>
+
+                  <p className="text-xs text-muted">
+                    Unlock HOME using your PC's native platform authenticator: Windows Hello Fingerprint / Face / PIN or macOS Touch ID.
+                  </p>
+
+                  <div className="flex items-center gap-2 pt-1">
+                    {secProfile.biometricEnabled ? (
+                      <button
+                        type="button"
+                        onClick={handleRemoveBiometric}
+                        className="px-3 py-1.5 rounded-xl glass-subtle hover:bg-rose-500/10 border border-subtle text-xs font-semibold text-rose-500 transition-colors"
+                      >
+                        Remove Biometric Key
+                      </button>
+                    ) : (
+                      <button
+                        type="button"
+                        onClick={handleRegisterBiometric}
+                        disabled={isBiometricBusy}
+                        className="flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-accent text-white text-xs font-bold hover:bg-accent-hover disabled:opacity-60 transition-colors shadow-sm"
+                      >
+                        {isBiometricBusy ? (
+                          <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                        ) : (
+                          <Fingerprint className="w-3.5 h-3.5" />
+                        )}
+                        <span>Register Windows Hello / Touch ID</span>
+                      </button>
+                    )}
+                  </div>
+                </div>
+
+                {/* Automated Lock Behavior Settings */}
+                <div className="p-4 rounded-2xl glass-subtle border-subtle space-y-4">
+                  <div className="text-xs font-bold text-main">Lock Automation</div>
+
+                  {/* Auto-Lock Idle Timer */}
+                  <div className="flex items-center justify-between gap-3">
+                    <div>
+                      <div className="text-xs font-semibold text-main">Auto-Lock when idle</div>
+                      <div className="text-[11px] text-muted">
+                        Automatically lock screen after inactivity
+                      </div>
+                    </div>
+                    <select
+                      value={secProfile.autoLockMinutes}
+                      onChange={e => {
+                        const val = Number(e.target.value);
+                        const updated = SecurityService.saveProfile({ autoLockMinutes: val });
+                        setSecProfile(updated);
+                        showToast(`Auto-lock set to ${val === 0 ? 'Never' : `${val} min`}`, 'info');
+                      }}
+                      className="px-3 py-1.5 rounded-xl glass-subtle border border-subtle text-xs text-main bg-transparent focus:outline-none focus:border-accent cursor-pointer"
+                    >
+                      <option value={0} className="bg-slate-900 text-white">Never</option>
+                      <option value={1} className="bg-slate-900 text-white">After 1 minute</option>
+                      <option value={5} className="bg-slate-900 text-white">After 5 minutes</option>
+                      <option value={15} className="bg-slate-900 text-white">After 15 minutes</option>
+                      <option value={30} className="bg-slate-900 text-white">After 30 minutes</option>
+                      <option value={60} className="bg-slate-900 text-white">After 1 hour</option>
+                    </select>
+                  </div>
+
+                  {/* Startup Lock Checkbox */}
+                  <label className="flex items-center justify-between gap-3 cursor-pointer pt-2 border-t border-subtle">
+                    <div>
+                      <div className="text-xs font-semibold text-main">Lock PC on Startup</div>
+                      <div className="text-[11px] text-muted">
+                        Require unlock PIN or Biometrics every time HOME is opened
+                      </div>
+                    </div>
+                    <input
+                      type="checkbox"
+                      checked={secProfile.requireLockOnStartup}
+                      onChange={e => {
+                        const updated = SecurityService.saveProfile({
+                          requireLockOnStartup: e.target.checked,
+                        });
+                        setSecProfile(updated);
+                        showToast(
+                          e.target.checked ? 'Startup lock enabled' : 'Startup lock disabled',
+                          'info'
+                        );
+                      }}
+                      className="w-4 h-4 rounded text-accent focus:ring-accent accent-accent cursor-pointer"
+                    />
+                  </label>
+                </div>
+
+                {/* Phone-to-PC QR Login Explainer */}
+                <div className="p-4 rounded-2xl glass-subtle border border-subtle space-y-2">
+                  <div className="flex items-center gap-2">
+                    <Smartphone className="w-4 h-4 text-accent" />
+                    <div className="text-xs font-bold text-main">Phone-to-PC QR Login</div>
+                  </div>
+                  <p className="text-xs text-muted leading-relaxed">
+                    Whenever this PC is locked, it displays a dynamic QR code on the screen. Scan it with HOME on your phone using the QR Scanner (<span className="text-accent font-semibold">Backup & Restore → Scan</span>) to approve login with 1 tap. Your smartphone securely unlocks the PC and syncs your apps & settings over direct peer-to-peer WebRTC with zero servers.
+                  </p>
                 </div>
               </div>
             )}

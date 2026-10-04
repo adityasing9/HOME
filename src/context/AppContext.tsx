@@ -2,6 +2,7 @@ import React, { createContext, useContext, useState, useEffect, useCallback, use
 import type { AppItem, UserSettings, SortOption } from '../types';
 import { AppRepository } from '../services/appRepository';
 import { SettingsRepository } from '../services/settingsRepository';
+import { SecurityService } from '../services/securityService';
 
 export interface ToastMessage {
   id: string;
@@ -35,6 +36,10 @@ interface AppContextType {
   setEditingApp: (app: AppItem | null) => void;
   isSettingsOpen: boolean;
   setIsSettingsOpen: (open: boolean) => void;
+  isPCLocked: boolean;
+  setIsPCLocked: (locked: boolean) => void;
+  lockPC: () => void;
+  unlockPC: () => void;
   isQROpen: boolean;
   setIsQROpen: (open: boolean) => void;
   qrInitialTab: 'export' | 'scan';
@@ -79,6 +84,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [isGitHubImportOpen, setIsGitHubImportOpen] = useState(false);
   const [editingApp, setEditingApp] = useState<AppItem | null>(null);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const [isPCLocked, setIsPCLocked] = useState<boolean>(() => SecurityService.isLocked());
   const [isQROpen, setIsQROpen] = useState(false);
   const [qrInitialTab, setQRInitialTab] = useState<'export' | 'scan'>('export');
   const [qrTargetApp, setQRTargetApp] = useState<AppItem | null>(null);
@@ -278,6 +284,17 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     setDeferredPrompt(null);
   }, [deferredPrompt, showToast]);
 
+  const lockPC = useCallback(() => {
+    SecurityService.lock();
+    setIsPCLocked(true);
+    showToast('PC is now locked', 'info');
+  }, [showToast]);
+
+  const unlockPC = useCallback(() => {
+    SecurityService.unlock();
+    setIsPCLocked(false);
+  }, []);
+
   const openQRModal = useCallback((tab: 'export' | 'scan' = 'export', targetApp: AppItem | null = null) => {
     setQRInitialTab(tab);
     setQRTargetApp(targetApp);
@@ -337,9 +354,38 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     return () => window.removeEventListener('hashchange', handleHash);
   }, []);
 
+  // Auto-lock idle timer
+  useEffect(() => {
+    const profile = SecurityService.getProfile();
+    if (profile.autoLockMinutes <= 0 || isPCLocked) return;
+
+    let timer: ReturnType<typeof setTimeout>;
+    const resetTimer = () => {
+      clearTimeout(timer);
+      timer = setTimeout(() => {
+        lockPC();
+      }, profile.autoLockMinutes * 60 * 1000);
+    };
+
+    resetTimer();
+    const events = ['mousemove', 'mousedown', 'keydown', 'touchstart'];
+    events.forEach(ev => window.addEventListener(ev, resetTimer, { passive: true }));
+    return () => {
+      clearTimeout(timer);
+      events.forEach(ev => window.removeEventListener(ev, resetTimer));
+    };
+  }, [isPCLocked, lockPC]);
+
   // Global keyboard shortcuts
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
+      // Ctrl/Cmd + L -> Lock PC
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'l') {
+        e.preventDefault();
+        lockPC();
+        return;
+      }
+
       // Ctrl/Cmd + K -> search
       if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
         e.preventDefault();
@@ -389,7 +435,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isQROpen, isAddAppOpen, isGitHubImportOpen, editingApp, isSettingsOpen, searchQuery, activeView]);
+  }, [lockPC, isQROpen, isAddAppOpen, isGitHubImportOpen, editingApp, isSettingsOpen, searchQuery, activeView]);
 
   const value = useMemo<AppContextType>(() => ({
     apps,
@@ -412,6 +458,10 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     setEditingApp,
     isSettingsOpen,
     setIsSettingsOpen,
+    isPCLocked,
+    setIsPCLocked,
+    lockPC,
+    unlockPC,
     isQROpen,
     setIsQROpen,
     qrInitialTab,
@@ -452,6 +502,9 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     isGitHubImportOpen,
     editingApp,
     isSettingsOpen,
+    isPCLocked,
+    lockPC,
+    unlockPC,
     isQROpen,
     qrInitialTab,
     qrTargetApp,

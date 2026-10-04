@@ -23,10 +23,11 @@ export interface QRLauncherPayload {
 }
 
 export interface ParsedQRResult {
-  type: 'full-sync' | 'single-app' | 'generic-url' | 'unknown';
+  type: 'full-sync' | 'single-app' | 'generic-url' | 'pc-login' | 'unknown';
   apps?: AppItem[];
   settings?: Partial<UserSettings>;
   url?: string;
+  sessionId?: string;
   rawText: string;
 }
 
@@ -155,6 +156,18 @@ export class QRService {
     }
 
     let payloadString = trimmed;
+
+    // Check if the scanned text is a PC Login QR code (e.g., https://.../#pc-login=SESSION_ID)
+    if (trimmed.includes('#pc-login=')) {
+      const match = trimmed.match(/#pc-login=([^&]+)/);
+      if (match && match[1]) {
+        return {
+          type: 'pc-login',
+          sessionId: decodeURIComponent(match[1]),
+          rawText,
+        };
+      }
+    }
 
     // Check if the scanned text is a HOME share URL (e.g., https://.../#import=... or #sync=...)
     if (trimmed.includes('#import=') || trimmed.includes('#sync=')) {

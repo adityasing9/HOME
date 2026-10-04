@@ -11,6 +11,7 @@ import { SettingsModal } from './components/modals/SettingsModal';
 import { FirstRunModal } from './components/modals/FirstRunModal';
 import { GitHubImportModal } from './components/modals/GitHubImportModal';
 import { QRModal } from './components/modals/QRModal';
+import { PCLockScreen } from './components/auth/PCLockScreen';
 import { ToastContainer } from './components/common/ToastContainer';
 
 const MainShell: React.FC = () => {
@@ -94,6 +95,7 @@ const MainShell: React.FC = () => {
       <FirstRunModal />
       <GitHubImportModal />
       <QRModal />
+      <PCLockScreen />
 
       {/* Toast Notification Container */}
       <ToastContainer />
