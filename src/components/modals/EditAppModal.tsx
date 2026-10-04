@@ -94,8 +94,13 @@ export const EditAppModal: React.FC = () => {
           setCustomIconUrl(res.bestIcon);
           setIconMode('url');
         }
-        setDetectionMessage(`Found ${res.icons.length} PWA icon(s)`);
-        showToast(`Discovered ${res.icons.length} PWA logo option(s)!`, 'success');
+        if (res.isActualInstallLogo) {
+          setDetectionMessage('⚡ Official PWA install logo fetched');
+          showToast('Fetched actual PWA install logo from manifest!', 'success');
+        } else {
+          setDetectionMessage(`Found ${res.icons.length} PWA icon(s)`);
+          showToast(`Discovered ${res.icons.length} PWA logo option(s)!`, 'success');
+        }
       } else {
         setDetectionMessage('No PWA icons reachable');
         showToast('No PWA manifest icons reachable for this URL', 'info');
@@ -383,7 +388,14 @@ export const EditAppModal: React.FC = () => {
                           />
                         </div>
                         <div className="text-left">
-                          <div className="text-[11px] leading-tight truncate max-w-[120px]">{cand.label}</div>
+                          <div className="flex items-center gap-1.5">
+                            <span className="text-[11px] leading-tight truncate max-w-[130px] font-medium">{cand.label}</span>
+                            {cand.isInstallLogo && (
+                              <span className="px-1 py-0.2 rounded text-[8px] bg-emerald-500/20 text-emerald-400 font-bold uppercase tracking-wider">
+                                Install Logo
+                              </span>
+                            )}
+                          </div>
                           {cand.sizes && <div className="text-[9px] text-muted">{cand.sizes}</div>}
                         </div>
                       </button>
