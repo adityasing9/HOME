@@ -67,18 +67,18 @@ const MainShell: React.FC = () => {
       <Header />
 
       {/* Main Centered Workspace */}
-      <main className="flex-1 flex flex-col items-center p-3 sm:p-6 md:p-8 pb-20 md:pb-8 z-10 w-full max-w-7xl mx-auto">
-        <div className="w-full max-w-[660px] my-auto">
+      <main className="flex-1 flex flex-col items-center p-2 sm:p-4 md:p-8 pb-20 md:pb-8 z-10 w-full max-w-7xl mx-auto min-h-0">
+        <div className="w-full flex-1 flex flex-col md:my-auto max-w-full md:max-w-[660px] min-h-0">
           {activeView === 'home' && <HomePanel />}
 
           {activeView === 'all-apps' && (
-            <div className="w-full rounded-[28px] home-panel-window overflow-hidden flex flex-col p-5 sm:p-7 backdrop-blur-2xl animate-in fade-in zoom-in-[0.98]">
+            <div className="w-full flex-1 rounded-2xl md:rounded-[28px] home-panel-window overflow-hidden flex flex-col p-4 sm:p-6 md:p-7 backdrop-blur-2xl animate-in fade-in zoom-in-[0.98] min-h-0">
               <AllAppsView />
             </div>
           )}
 
           {activeView === 'favorites' && (
-            <div className="w-full rounded-[28px] home-panel-window overflow-hidden flex flex-col p-5 sm:p-7 backdrop-blur-2xl animate-in fade-in zoom-in-[0.98]">
+            <div className="w-full flex-1 rounded-2xl md:rounded-[28px] home-panel-window overflow-hidden flex flex-col p-4 sm:p-6 md:p-7 backdrop-blur-2xl animate-in fade-in zoom-in-[0.98] min-h-0">
               <FavoritesView />
             </div>
           )}

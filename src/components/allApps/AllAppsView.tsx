@@ -151,7 +151,7 @@ export const AllAppsView: React.FC = () => {
   };
 
   return (
-    <div className="w-full flex flex-col h-[580px]">
+    <div className="w-full flex-1 flex flex-col min-h-0">
       {/* Top Header */}
       {isSelectMode ? (
         <div className="flex items-center justify-between pb-3 border-b border-subtle bg-accent/5 px-2 py-1.5 rounded-xl">

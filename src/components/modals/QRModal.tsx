@@ -546,9 +546,9 @@ export const QRModal: React.FC = () => {
   if (!isQROpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/60 backdrop-blur-md animate-in fade-in duration-200">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-0 sm:p-4 bg-black/60 backdrop-blur-md animate-in fade-in duration-200">
       <div
-        className="w-full max-w-xl max-h-[92vh] flex flex-col rounded-[26px] home-panel-window border-subtle shadow-2xl backdrop-blur-2xl overflow-hidden animate-in zoom-in-95 duration-200"
+        className="w-full h-full sm:h-auto sm:max-h-[92vh] sm:max-w-2xl md:max-w-3xl flex flex-col rounded-none sm:rounded-[26px] home-panel-window border-0 sm:border border-subtle shadow-2xl backdrop-blur-2xl overflow-hidden animate-in zoom-in-95 duration-200"
         onClick={e => e.stopPropagation()}
       >
         {/* Modal Header */}

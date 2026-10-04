@@ -331,9 +331,9 @@ export const SettingsModal: React.FC = () => {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-black/60 backdrop-blur-md animate-in fade-in duration-150">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-0 sm:p-6 bg-black/60 backdrop-blur-md animate-in fade-in duration-150">
       <div
-        className="w-full max-w-3xl rounded-3xl home-panel-window border-subtle shadow-2xl overflow-hidden flex flex-col h-[85vh] max-h-[720px]"
+        className="w-full h-full sm:h-[88vh] sm:max-h-[760px] sm:max-w-3xl rounded-none sm:rounded-3xl home-panel-window border-0 sm:border border-subtle shadow-2xl overflow-hidden flex flex-col"
         onClick={e => e.stopPropagation()}
       >
         {/* Header */}

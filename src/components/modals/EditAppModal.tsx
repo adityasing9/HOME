@@ -203,9 +203,9 @@ export const EditAppModal: React.FC = () => {
   const currentIconData = getIconData();
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-md animate-in fade-in duration-150">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-0 sm:p-4 bg-black/60 backdrop-blur-md animate-in fade-in duration-150">
       <div
-        className="w-full max-w-lg rounded-3xl home-panel-window border-subtle shadow-2xl overflow-hidden flex flex-col max-h-[92vh]"
+        className="w-full h-full sm:h-auto sm:max-h-[92vh] sm:max-w-lg rounded-none sm:rounded-3xl home-panel-window border-0 sm:border border-subtle shadow-2xl overflow-hidden flex flex-col"
         onClick={e => e.stopPropagation()}
       >
         {/* Header */}
