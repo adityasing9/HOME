@@ -2,8 +2,93 @@ import type { AppItem } from '../types';
 import { DEFAULT_APPS } from '../data/defaultApps';
 
 const STORAGE_KEY = 'HOME_APPS_V1';
+const FAILED_ICONS_KEY = 'HOME_FAILED_ICON_URLS_V1';
 
 export class AppRepository {
+  /**
+   * Check if domain belongs to a staging, dev, or local environment where Google favicons will 404
+   */
+  static isStagingOrDevDomain(domain: string): boolean {
+    const d = domain.toLowerCase();
+    return (
+      d.includes('.onrender.com') ||
+      d.includes('.vercel.app') ||
+      d.includes('.netlify.app') ||
+      d.includes('.railway.app') ||
+      d.includes('.fly.dev') ||
+      d.includes('localhost') ||
+      d.endsWith('.local') ||
+      d.endsWith('.internal')
+    );
+  }
+
+  /**
+   * Get set of known broken icon URLs
+   */
+  static getFailedIcons(): Set<string> {
+    try {
+      const raw = localStorage.getItem(FAILED_ICONS_KEY);
+      if (!raw) return new Set();
+      const arr = JSON.parse(raw);
+      return new Set(Array.isArray(arr) ? arr : []);
+    } catch {
+      return new Set();
+    }
+  }
+
+  /**
+   * Cache a known broken icon URL so it is never requested over network again
+   */
+  static markIconFailed(iconUrl: string): void {
+    if (!iconUrl) return;
+    try {
+      const failed = this.getFailedIcons();
+      if (!failed.has(iconUrl)) {
+        failed.add(iconUrl);
+        localStorage.setItem(FAILED_ICONS_KEY, JSON.stringify(Array.from(failed)));
+      }
+    } catch (e) {
+      console.warn('Failed to cache broken icon URL:', e);
+    }
+  }
+
+  /**
+   * Sanitize existing apps: strip broken or non-existent favicon URLs from dev domains
+   */
+  static sanitizeApps(apps: AppItem[]): AppItem[] {
+    const failedIcons = this.getFailedIcons();
+    let modified = false;
+
+    const sanitized = apps.map(app => {
+      if (app.icon) {
+        // If already flagged as broken
+        if (failedIcons.has(app.icon)) {
+          modified = true;
+          return { ...app, icon: undefined, iconType: 'letter' as const };
+        }
+        // If pointing to a dev/staging domain on Google Favicon resolver
+        if (app.icon.includes('google.com/s2/favicons') || app.icon.includes('gstatic.com/faviconV2')) {
+          const match = app.icon.match(/domain=([^&]+)/) || app.icon.match(/url=([^&]+)/);
+          if (match && this.isStagingOrDevDomain(decodeURIComponent(match[1]))) {
+            modified = true;
+            failedIcons.add(app.icon);
+            return { ...app, icon: undefined, iconType: 'letter' as const };
+          }
+        }
+      }
+      return app;
+    });
+
+    if (modified) {
+      try {
+        localStorage.setItem(FAILED_ICONS_KEY, JSON.stringify(Array.from(failedIcons)));
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(sanitized));
+      } catch {}
+    }
+
+    return sanitized;
+  }
+
   static getApps(): AppItem[] {
     try {
       const raw = localStorage.getItem(STORAGE_KEY);
@@ -13,7 +98,7 @@ export class AppRepository {
       }
       const parsed = JSON.parse(raw);
       if (Array.isArray(parsed)) {
-        return parsed;
+        return this.sanitizeApps(parsed);
       }
       return DEFAULT_APPS;
     } catch (e) {
@@ -169,8 +254,11 @@ export class AppRepository {
       const rawName = parts[0] || 'App';
       const name = rawName.charAt(0).toUpperCase() + rawName.slice(1);
 
-      // standard reliable high-res Google favicon resolver
-      const iconUrl = `https://www.google.com/s2/favicons?domain=${domain}&sz=128`;
+      // standard reliable high-res Google favicon resolver for public domains
+      // For staging/dev domains (e.g. vercel.app, onrender.com), do not set external favicon URL to prevent 404s
+      const iconUrl = this.isStagingOrDevDomain(domain)
+        ? ''
+        : `https://www.google.com/s2/favicons?domain=${domain}&sz=128`;
 
       return { name, domain, iconUrl };
     } catch {

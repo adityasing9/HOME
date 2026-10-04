@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import type { AppItem, AppSize } from '../../types';
+import { AppRepository } from '../../services/appRepository';
 
 interface AppIconProps {
   app: Pick<AppItem, 'name' | 'icon' | 'iconType' | 'category'>;
@@ -61,7 +62,12 @@ const CATEGORY_STYLES: Record<string, { bg: string; text: string; shadow: string
 };
 
 export const AppIcon: React.FC<AppIconProps> = ({ app, size = 'standard', className = '' }) => {
-  const [imageError, setImageError] = useState(false);
+  const isFailed = Boolean(app.icon && AppRepository.getFailedIcons().has(app.icon));
+  const [imageError, setImageError] = useState(isFailed);
+
+  useEffect(() => {
+    setImageError(Boolean(app.icon && AppRepository.getFailedIcons().has(app.icon)));
+  }, [app.icon]);
 
   const sizeClasses: Record<string, { box: string; text: string; img: string; emoji: string }> = {
     compact: { box: 'w-10 h-10 rounded-[14px]', text: 'text-sm font-bold', img: 'w-5 h-5', emoji: 'text-base' },
@@ -79,8 +85,10 @@ export const AppIcon: React.FC<AppIconProps> = ({ app, size = 'standard', classN
 
   // Custom image or URL
   const isImage =
-    (app.iconType === 'image' || app.iconType === 'url' || (app.icon && (app.icon.startsWith('http') || app.icon.startsWith('data:')))) &&
-    !imageError;
+    !isFailed &&
+    !imageError &&
+    Boolean(app.icon) &&
+    (app.iconType === 'image' || app.iconType === 'url' || app.icon?.startsWith('http') || app.icon?.startsWith('data:'));
 
   if (isImage && app.icon) {
     return (
@@ -91,7 +99,10 @@ export const AppIcon: React.FC<AppIconProps> = ({ app, size = 'standard', classN
           src={app.icon}
           alt={app.name}
           className={`${currentSize.img} object-contain select-none`}
-          onError={() => setImageError(true)}
+          onError={() => {
+            if (app.icon) AppRepository.markIconFailed(app.icon);
+            setImageError(true);
+          }}
           loading="lazy"
         />
       </div>

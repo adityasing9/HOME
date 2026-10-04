@@ -276,7 +276,7 @@ const AppRow: React.FC<AppRowProps> = ({ app, onLaunch, onContextMenu, onOpenMen
         <ExternalLink className="w-3.5 h-3.5 text-muted opacity-0 group-hover:opacity-100 transition-opacity" />
         <button
           onClick={onOpenMenu}
-          className="p-1 rounded-lg text-muted opacity-0 group-hover:opacity-100 hover:text-main hover-tile transition-all"
+          className="p-1 rounded-lg text-muted opacity-70 sm:opacity-0 sm:group-hover:opacity-100 hover:text-main hover-tile transition-all"
         >
           <MoreVertical className="w-3.5 h-3.5" />
         </button>

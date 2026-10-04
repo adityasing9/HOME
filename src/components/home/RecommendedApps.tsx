@@ -129,7 +129,7 @@ export const RecommendedApps: React.FC = () => {
 
               <button
                 onClick={e => openButtonMenu(e, app)}
-                className="p-1 rounded-lg text-muted opacity-0 group-hover:opacity-100 hover:text-main hover-tile transition-all flex-shrink-0"
+                className="p-1 rounded-lg text-muted opacity-70 sm:opacity-0 sm:group-hover:opacity-100 hover:text-main hover-tile transition-all flex-shrink-0"
                 aria-label="Options"
               >
                 <MoreVertical className="w-3.5 h-3.5" />

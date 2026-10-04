@@ -158,7 +158,7 @@ export const PinnedApps: React.FC = () => {
                 {/* 3-dots Context Menu button */}
                 <button
                   onClick={e => openButtonContextMenu(e, app, index)}
-                  className="absolute top-1 right-1 p-0.5 rounded-md text-muted opacity-0 group-hover:opacity-100 hover:text-main transition-all"
+                  className="absolute top-1 right-1 p-0.5 rounded-md text-muted opacity-60 sm:opacity-0 sm:group-hover:opacity-100 hover:text-main transition-all"
                   aria-label={`Options for ${app.name}`}
                   title="More actions"
                 >

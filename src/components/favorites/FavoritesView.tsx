@@ -110,7 +110,7 @@ export const FavoritesView: React.FC = () => {
 
                 <button
                   onClick={e => openButtonContextMenu(e, app)}
-                  className="p-1 rounded-lg text-muted opacity-0 group-hover:opacity-100 hover:text-main hover-tile transition-all"
+                  className="p-1 rounded-lg text-muted opacity-70 sm:opacity-0 sm:group-hover:opacity-100 hover:text-main hover-tile transition-all"
                 >
                   <MoreVertical className="w-3.5 h-3.5" />
                 </button>
