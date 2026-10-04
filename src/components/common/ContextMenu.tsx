@@ -1,4 +1,5 @@
 import React, { useEffect, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import { CATEGORIES, type AppItem } from '../../types';
 import { useApp } from '../../context/AppContext';
 import {
@@ -50,16 +51,29 @@ export const ContextMenu: React.FC<ContextMenuProps> = ({
     };
   }, [onClose]);
 
-  const menuWidth = 210;
-  const menuHeight = 280;
-  const left = Math.min(position.x, window.innerWidth - menuWidth - 12);
-  const top = Math.min(position.y, window.innerHeight - menuHeight - 12);
+  const menuWidth = 224;
+  const menuHeight = 310;
+  
+  // Smart boundary checks: flip left or up if opening would clip viewport
+  let left = position.x;
+  if (left + menuWidth > window.innerWidth - 16) {
+    left = Math.max(16, position.x - menuWidth);
+  } else {
+    left = Math.max(16, left);
+  }
 
-  return (
+  let top = position.y;
+  if (top + menuHeight > window.innerHeight - 16) {
+    top = Math.max(16, position.y - menuHeight);
+  } else {
+    top = Math.max(16, top);
+  }
+
+  return createPortal(
     <div
       ref={menuRef}
-      style={{ left: `${Math.max(12, left)}px`, top: `${Math.max(12, top)}px` }}
-      className="fixed z-50 w-52 py-1.5 rounded-2xl home-panel-window border-subtle shadow-2xl text-xs font-medium text-main animate-in fade-in zoom-in-95 duration-150 backdrop-blur-xl"
+      style={{ left: `${left}px`, top: `${top}px` }}
+      className="fixed z-50 w-56 py-1.5 rounded-2xl home-panel-window border-subtle shadow-2xl text-xs font-medium text-main animate-in fade-in zoom-in-95 duration-150 backdrop-blur-2xl"
     >
       {/* App Header Preview */}
       <div className="px-3 py-2 border-b border-subtle mb-1 flex items-center justify-between">
@@ -165,7 +179,11 @@ export const ContextMenu: React.FC<ContextMenuProps> = ({
         </button>
 
         {showCategorySubmenu && (
-          <div className="absolute left-full top-0 ml-1 w-40 max-h-48 overflow-y-auto py-1.5 rounded-xl home-panel-window border-subtle shadow-2xl text-xs">
+          <div
+            className={`absolute top-0 py-1.5 w-40 max-h-48 overflow-y-auto rounded-xl home-panel-window border-subtle shadow-2xl text-xs z-50 ${
+              left + menuWidth + 165 > window.innerWidth ? 'right-full mr-1' : 'left-full ml-1'
+            }`}
+          >
             {CATEGORIES.map(cat => (
               <button
                 key={cat}
@@ -210,6 +228,7 @@ export const ContextMenu: React.FC<ContextMenuProps> = ({
         <Trash2 className="w-3.5 h-3.5 text-rose-500" />
         <span>Remove from HOME</span>
       </button>
-    </div>
+    </div>,
+    document.body
   );
 };

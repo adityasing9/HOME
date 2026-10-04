@@ -64,20 +64,22 @@ const MainShell: React.FC = () => {
       <Header />
 
       {/* Main Centered Workspace */}
-      <main className="flex-1 flex flex-col items-center justify-center p-3 sm:p-6 md:p-8 pb-20 md:pb-8 z-10 w-full max-w-7xl mx-auto">
-        {activeView === 'home' && <HomePanel />}
+      <main className="flex-1 flex flex-col items-center p-3 sm:p-6 md:p-8 pb-20 md:pb-8 z-10 w-full max-w-7xl mx-auto">
+        <div className="w-full max-w-[660px] my-auto">
+          {activeView === 'home' && <HomePanel />}
 
-        {activeView === 'all-apps' && (
-          <div className="w-full max-w-[660px] rounded-[28px] home-panel-window overflow-hidden flex flex-col p-5 sm:p-7 backdrop-blur-2xl animate-in fade-in zoom-in-[0.98]">
-            <AllAppsView />
-          </div>
-        )}
+          {activeView === 'all-apps' && (
+            <div className="w-full rounded-[28px] home-panel-window overflow-hidden flex flex-col p-5 sm:p-7 backdrop-blur-2xl animate-in fade-in zoom-in-[0.98]">
+              <AllAppsView />
+            </div>
+          )}
 
-        {activeView === 'favorites' && (
-          <div className="w-full max-w-[660px] rounded-[28px] home-panel-window overflow-hidden flex flex-col p-5 sm:p-7 backdrop-blur-2xl animate-in fade-in zoom-in-[0.98]">
-            <FavoritesView />
-          </div>
-        )}
+          {activeView === 'favorites' && (
+            <div className="w-full rounded-[28px] home-panel-window overflow-hidden flex flex-col p-5 sm:p-7 backdrop-blur-2xl animate-in fade-in zoom-in-[0.98]">
+              <FavoritesView />
+            </div>
+          )}
+        </div>
       </main>
 
       {/* Mobile Bottom Dock */}
