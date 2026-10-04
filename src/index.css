@@ -349,3 +349,47 @@
     radial-gradient(circle at 50% 0%, rgba(0, 0, 0, 0.03) 0%, transparent 60%),
     #f8fafc;
 }
+
+/* ========================================================
+   MOBILE APP ARRANGE JIGGLE ANIMATION (iOS / Android style)
+   ======================================================== */
+@keyframes mobile-app-wobble {
+  0% {
+    transform: rotate(-1.5deg) scale(0.98);
+  }
+  50% {
+    transform: rotate(1.5deg) scale(1.01);
+  }
+  100% {
+    transform: rotate(-1.5deg) scale(0.98);
+  }
+}
+
+@keyframes mobile-app-wobble-alt {
+  0% {
+    transform: rotate(1.5deg) scale(1.01);
+  }
+  50% {
+    transform: rotate(-1.5deg) scale(0.98);
+  }
+  100% {
+    transform: rotate(1.5deg) scale(1.01);
+  }
+}
+
+.animate-app-wobble {
+  animation: mobile-app-wobble 0.28s ease-in-out infinite;
+  transform-origin: 50% 50%;
+}
+
+.animate-app-wobble-alt {
+  animation: mobile-app-wobble-alt 0.32s ease-in-out infinite;
+  transform-origin: 50% 50%;
+}
+
+/* Optimize touch interactions for smooth finger dragging without page pull */
+.touch-drag-none {
+  touch-action: none !important;
+  user-select: none !important;
+  -webkit-user-select: none !important;
+}
