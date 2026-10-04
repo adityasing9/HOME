@@ -69,15 +69,15 @@ export const AppIcon: React.FC<AppIconProps> = ({ app, size = 'standard', classN
     setImageError(Boolean(app.icon && AppRepository.getFailedIcons().has(app.icon)));
   }, [app.icon]);
 
-  const sizeClasses: Record<string, { box: string; text: string; img: string; emoji: string }> = {
-    compact: { box: 'w-10 h-10 rounded-[14px]', text: 'text-sm font-bold', img: 'w-5 h-5', emoji: 'text-base' },
-    standard: { box: 'w-12 h-12 rounded-[18px]', text: 'text-base font-bold', img: 'w-6 h-6', emoji: 'text-xl' },
-    spacious: { box: 'w-14 h-14 rounded-[20px]', text: 'text-lg font-bold', img: 'w-7 h-7', emoji: 'text-2xl' },
-    xs: { box: 'w-6 h-6 rounded-lg', text: 'text-[10px] font-bold', img: 'w-3.5 h-3.5', emoji: 'text-xs' },
-    sm: { box: 'w-9 h-9 rounded-xl', text: 'text-xs font-bold', img: 'w-4.5 h-4.5', emoji: 'text-sm' },
-    md: { box: 'w-11 h-11 rounded-[16px]', text: 'text-sm font-bold', img: 'w-5.5 h-5.5', emoji: 'text-lg' },
-    lg: { box: 'w-12 h-12 rounded-[18px]', text: 'text-base font-bold', img: 'w-6 h-6', emoji: 'text-xl' },
-    xl: { box: 'w-16 h-16 rounded-[24px]', text: 'text-2xl font-bold', img: 'w-9 h-9', emoji: 'text-3xl' },
+  const sizeClasses: Record<string, { box: string; text: string; emoji: string }> = {
+    compact: { box: 'w-10 h-10 rounded-[14px]', text: 'text-sm font-bold', emoji: 'text-base' },
+    standard: { box: 'w-12 h-12 rounded-[18px]', text: 'text-base font-bold', emoji: 'text-xl' },
+    spacious: { box: 'w-14 h-14 rounded-[20px]', text: 'text-lg font-bold', emoji: 'text-2xl' },
+    xs: { box: 'w-6 h-6 rounded-lg', text: 'text-[10px] font-bold', emoji: 'text-xs' },
+    sm: { box: 'w-9 h-9 rounded-xl', text: 'text-xs font-bold', emoji: 'text-sm' },
+    md: { box: 'w-11 h-11 rounded-[16px]', text: 'text-sm font-bold', emoji: 'text-lg' },
+    lg: { box: 'w-12 h-12 rounded-[18px]', text: 'text-base font-bold', emoji: 'text-xl' },
+    xl: { box: 'w-16 h-16 rounded-[24px]', text: 'text-2xl font-bold', emoji: 'text-3xl' },
   };
 
   const currentSize = sizeClasses[size] || sizeClasses.standard;
@@ -93,12 +93,12 @@ export const AppIcon: React.FC<AppIconProps> = ({ app, size = 'standard', classN
   if (isImage && app.icon) {
     return (
       <div
-        className={`${currentSize.box} relative flex items-center justify-center bg-white/10 dark:bg-slate-800/80 border border-white/10 shadow-sm ${style.shadow} overflow-hidden flex-shrink-0 transition-transform duration-200 group-hover:scale-105 ${className}`}
+        className={`${currentSize.box} relative flex items-center justify-center bg-transparent overflow-hidden flex-shrink-0 transition-transform duration-200 group-hover:scale-105 ${className}`}
       >
         <img
           src={app.icon}
           alt={app.name}
-          className={`${currentSize.img} object-contain select-none`}
+          className="w-full h-full object-cover rounded-[inherit] select-none"
           onError={() => {
             if (app.icon) AppRepository.markIconFailed(app.icon);
             setImageError(true);

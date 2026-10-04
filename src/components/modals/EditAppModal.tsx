@@ -379,11 +379,11 @@ export const EditAppModal: React.FC = () => {
                             : 'glass-subtle border-subtle text-muted hover:text-main'
                         }`}
                       >
-                        <div className="w-6 h-6 rounded-lg bg-black/10 dark:bg-white/10 overflow-hidden flex items-center justify-center flex-shrink-0">
+                        <div className="w-7 h-7 rounded-lg bg-transparent overflow-hidden flex items-center justify-center flex-shrink-0">
                           <img
                             src={cand.url}
                             alt={cand.label}
-                            className="w-5 h-5 object-contain"
+                            className="w-full h-full object-cover rounded-lg"
                             loading="lazy"
                           />
                         </div>
