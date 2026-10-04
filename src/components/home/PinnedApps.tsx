@@ -1,9 +1,38 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState, useRef, useEffect } from 'react';
 import { useApp } from '../../context/AppContext';
-import type { AppItem } from '../../types';
+import type { AppItem, PinnedSortOption } from '../../types';
 import { AppIcon } from '../common/AppIcon';
 import { ContextMenu } from '../common/ContextMenu';
-import { ChevronRight, Star, MoreVertical } from 'lucide-react';
+import { ChevronRight, Star, MoreVertical, ArrowUpDown, Check } from 'lucide-react';
+
+const sortPinnedList = (list: AppItem[], sortMode: PinnedSortOption): AppItem[] => {
+  const arr = [...list];
+  switch (sortMode) {
+    case 'newest':
+      // Newest apps first (Last in 1st location)
+      return arr.sort((a, b) => (b.createdAt - a.createdAt) || (a.pinOrder - b.pinOrder));
+    case 'name-asc':
+      return arr.sort((a, b) => a.name.localeCompare(b.name));
+    case 'name-desc':
+      return arr.sort((a, b) => b.name.localeCompare(a.name));
+    case 'most-used':
+      return arr.sort((a, b) => (b.launchCount || 0) - (a.launchCount || 0));
+    case 'recently-opened':
+      return arr.sort((a, b) => (b.lastOpenedAt || 0) - (a.lastOpenedAt || 0));
+    case 'custom':
+    default:
+      return arr.sort((a, b) => a.pinOrder - b.pinOrder);
+  }
+};
+
+const SORT_OPTIONS: { value: PinnedSortOption; label: string }[] = [
+  { value: 'newest', label: 'Newest First (1st)' },
+  { value: 'custom', label: 'Custom (Drag & Drop)' },
+  { value: 'name-asc', label: 'Name (A → Z)' },
+  { value: 'name-desc', label: 'Name (Z → A)' },
+  { value: 'most-used', label: 'Most Launched' },
+  { value: 'recently-opened', label: 'Recently Opened' },
+];
 
 export const PinnedApps: React.FC = () => {
   const {
@@ -12,11 +41,36 @@ export const PinnedApps: React.FC = () => {
     launchApp,
     setActiveView,
     reorderPinned,
+    updateSettings,
   } = useApp();
 
-  const pinnedApps = [...apps]
-    .filter(a => a.pinned)
-    .sort((a, b) => a.pinOrder - b.pinOrder);
+  const [pinnedSort, setPinnedSort] = useState<PinnedSortOption>(
+    () => (settings.pinnedSort as PinnedSortOption) || 'newest'
+  );
+  const [showSortMenu, setShowSortMenu] = useState(false);
+  const sortMenuRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (settings.pinnedSort && settings.pinnedSort !== pinnedSort) {
+      setPinnedSort(settings.pinnedSort);
+    }
+  }, [settings.pinnedSort]);
+
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (sortMenuRef.current && !sortMenuRef.current.contains(e.target as Node)) {
+        setShowSortMenu(false);
+      }
+    };
+    if (showSortMenu) {
+      window.addEventListener('mousedown', handleClickOutside);
+    }
+    return () => window.removeEventListener('mousedown', handleClickOutside);
+  }, [showSortMenu]);
+
+  const pinnedApps = useMemo(() => {
+    return sortPinnedList(apps.filter(a => a.pinned), pinnedSort);
+  }, [apps, pinnedSort]);
 
   const [draggedAppId, setDraggedAppId] = useState<string | null>(null);
   const [dragOverAppId, setDragOverAppId] = useState<string | null>(null);
@@ -27,6 +81,15 @@ export const PinnedApps: React.FC = () => {
     position?: { x: number; y: number };
     index: number;
   } | null>(null);
+
+  const handleSortChange = (newSort: PinnedSortOption) => {
+    setPinnedSort(newSort);
+    updateSettings({ pinnedSort: newSort });
+
+    // Sync pinOrder so custom drag-and-drop continues from this sorted state
+    const sorted = sortPinnedList(apps.filter(a => a.pinned), newSort);
+    reorderPinned(sorted.map(a => a.id));
+  };
 
   const handleDragStart = (e: React.DragEvent, id: string) => {
     setDraggedAppId(id);
@@ -60,6 +123,10 @@ export const PinnedApps: React.FC = () => {
       const [moved] = newIds.splice(fromIndex, 1);
       newIds.splice(toIndex, 0, moved);
       reorderPinned(newIds);
+      if (pinnedSort !== 'custom') {
+        setPinnedSort('custom');
+        updateSettings({ pinnedSort: 'custom' });
+      }
     }
     setDraggedAppId(null);
   };
@@ -73,6 +140,10 @@ export const PinnedApps: React.FC = () => {
     currentIds[currentIndex] = currentIds[targetIndex];
     currentIds[targetIndex] = temp;
     reorderPinned(currentIds);
+    if (pinnedSort !== 'custom') {
+      setPinnedSort('custom');
+      updateSettings({ pinnedSort: 'custom' });
+    }
   };
 
   const handleContextMenu = (e: React.MouseEvent, app: AppItem, index: number) => {
@@ -105,19 +176,66 @@ export const PinnedApps: React.FC = () => {
 
   return (
     <div className="w-full">
-      {/* Pinned Section Header */}
+      {/* Pinned Section Header with Title, Count, Sort Control, and All Apps */}
       <div className="flex items-center justify-between mb-3 px-1">
-        <h2 className="text-xs sm:text-sm font-bold text-main tracking-normal">
-          Pinned
-        </h2>
+        <div className="flex items-center gap-2">
+          <h2 className="text-xs sm:text-sm font-bold text-main tracking-normal">
+            Pinned
+          </h2>
+          <span className="text-[10px] font-medium text-muted bg-black/5 dark:bg-white/5 px-2 py-0.5 rounded-full">
+            {pinnedApps.length}
+          </span>
+        </div>
 
-        <button
-          onClick={() => setActiveView('all-apps')}
-          className="group flex items-center gap-1 text-xs font-medium text-muted hover:text-main transition-colors px-2.5 py-1 rounded-lg hover-tile"
-        >
-          <span>All apps</span>
-          <ChevronRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
-        </button>
+        <div className="flex items-center gap-1.5 sm:gap-2">
+          {/* Sort Selector Dropdown */}
+          <div className="relative" ref={sortMenuRef}>
+            <button
+              type="button"
+              onClick={() => setShowSortMenu(prev => !prev)}
+              className="flex items-center gap-1.5 text-xs font-medium text-muted hover:text-main transition-colors px-2 py-1 rounded-lg hover-tile"
+              title="Sort pinned apps"
+            >
+              <ArrowUpDown className="w-3 h-3 text-muted" />
+              <span className="hidden sm:inline">
+                {SORT_OPTIONS.find(o => o.value === pinnedSort)?.label.split(' ')[0] || 'Sort'}
+              </span>
+              <span className="sm:hidden">Sort</span>
+            </button>
+
+            {showSortMenu && (
+              <div className="absolute right-0 top-full mt-1.5 w-48 py-1.5 rounded-2xl home-panel-window border-subtle shadow-2xl text-xs z-30 animate-in fade-in zoom-in-95 duration-100 backdrop-blur-2xl">
+                <div className="px-3 py-1 text-[10px] font-semibold text-muted uppercase tracking-wider border-b border-subtle mb-1">
+                  Sort Pinned Apps
+                </div>
+                {SORT_OPTIONS.map(opt => (
+                  <button
+                    key={opt.value}
+                    type="button"
+                    onClick={() => {
+                      handleSortChange(opt.value);
+                      setShowSortMenu(false);
+                    }}
+                    className={`w-full flex items-center justify-between px-3 py-1.5 text-left hover-tile transition-colors ${
+                      pinnedSort === opt.value ? 'text-accent font-semibold' : 'text-main'
+                    }`}
+                  >
+                    <span>{opt.label}</span>
+                    {pinnedSort === opt.value && <Check className="w-3.5 h-3.5 text-accent flex-shrink-0" />}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+
+          <button
+            onClick={() => setActiveView('all-apps')}
+            className="group flex items-center gap-1 text-xs font-medium text-muted hover:text-main transition-colors px-2.5 py-1 rounded-lg hover-tile"
+          >
+            <span>All apps</span>
+            <ChevronRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
+          </button>
+        </div>
       </div>
 
       {/* Grid of Pinned Apps */}

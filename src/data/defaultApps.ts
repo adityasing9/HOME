@@ -155,6 +155,7 @@ export const DEFAULT_SETTINGS: UserSettings = {
   appSize: 'standard',
   animations: true,
   defaultSort: 'name-asc',
+  pinnedSort: 'newest',
   defaultCategory: 'All',
   openInNewTab: true,
   searchDescriptions: true,

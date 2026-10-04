@@ -50,6 +50,14 @@ export interface AppItem {
   launchCount: number;
 }
 
+export type PinnedSortOption =
+  | 'newest'
+  | 'custom'
+  | 'name-asc'
+  | 'name-desc'
+  | 'most-used'
+  | 'recently-opened';
+
 export interface UserSettings {
   theme: ThemeMode;
   accentColor: AccentColor;
@@ -58,6 +66,7 @@ export interface UserSettings {
   appSize: AppSize;
   animations: boolean;
   defaultSort: SortOption;
+  pinnedSort: PinnedSortOption;
   defaultCategory: string;
   openInNewTab: boolean;
   searchDescriptions: boolean;

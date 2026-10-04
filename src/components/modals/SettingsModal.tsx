@@ -6,6 +6,7 @@ import type {
   BackgroundPreset,
   AppSize,
   SortOption,
+  PinnedSortOption,
 } from '../../types';
 import { SettingsRepository } from '../../services/settingsRepository';
 import { BackupService } from '../../services/backupService';
@@ -401,6 +402,24 @@ export const SettingsModal: React.FC = () => {
             {/* 2. APPS TAB */}
             {activeTab === 'apps' && (
               <div className="space-y-6">
+                <div>
+                  <label className="block text-xs font-bold uppercase tracking-wider text-muted mb-2">
+                    Pinned Apps Sorting
+                  </label>
+                  <select
+                    value={settings.pinnedSort || 'newest'}
+                    onChange={e => updateSettings({ pinnedSort: e.target.value as PinnedSortOption })}
+                    className="w-full px-3.5 py-2.5 rounded-xl home-input text-xs sm:text-sm cursor-pointer"
+                  >
+                    <option value="newest" className="bg-white text-slate-900 dark:bg-slate-900 dark:text-slate-100">Newest First (Last in 1st location)</option>
+                    <option value="custom" className="bg-white text-slate-900 dark:bg-slate-900 dark:text-slate-100">Custom Order (Drag & Drop)</option>
+                    <option value="name-asc" className="bg-white text-slate-900 dark:bg-slate-900 dark:text-slate-100">Alphabetical (A → Z)</option>
+                    <option value="name-desc" className="bg-white text-slate-900 dark:bg-slate-900 dark:text-slate-100">Alphabetical (Z → A)</option>
+                    <option value="most-used" className="bg-white text-slate-900 dark:bg-slate-900 dark:text-slate-100">Most Launched</option>
+                    <option value="recently-opened" className="bg-white text-slate-900 dark:bg-slate-900 dark:text-slate-100">Recently Opened</option>
+                  </select>
+                </div>
+
                 <div>
                   <label className="block text-xs font-bold uppercase tracking-wider text-muted mb-2">
                     Default All Apps Sorting

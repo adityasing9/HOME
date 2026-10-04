@@ -3,6 +3,7 @@ import { DEFAULT_APPS } from '../data/defaultApps';
 
 const STORAGE_KEY = 'HOME_APPS_V1';
 const FAILED_ICONS_KEY = 'HOME_FAILED_ICON_URLS_V1';
+const MIGRATION_NEWEST_PIN_ORDER_KEY = 'HOME_PIN_ORDER_NEWEST_V1';
 
 export class AppRepository {
   /**
@@ -106,7 +107,45 @@ export class AppRepository {
     return sanitized;
   }
 
+  /**
+   * One-time migration: ensure all currently pinned apps are indexed with newest apps first (at position 0, 1, 2...)
+   */
+  static migrateNewestFirst(): void {
+    if (typeof localStorage === 'undefined') return;
+    if (localStorage.getItem(MIGRATION_NEWEST_PIN_ORDER_KEY)) return;
+
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (!raw) {
+        localStorage.setItem(MIGRATION_NEWEST_PIN_ORDER_KEY, 'true');
+        return;
+      }
+      const parsed: AppItem[] = JSON.parse(raw);
+      if (Array.isArray(parsed) && parsed.length > 0) {
+        const pinned = parsed.filter(a => a.pinned);
+        // Sort newest first: by createdAt descending. If identical, higher old pinOrder first
+        pinned.sort((a, b) => (b.createdAt - a.createdAt) || (b.pinOrder - a.pinOrder));
+
+        const idToOrder = new Map<string, number>();
+        pinned.forEach((app, idx) => idToOrder.set(app.id, idx));
+
+        const updated = parsed.map(app => {
+          if (idToOrder.has(app.id)) {
+            return { ...app, pinOrder: idToOrder.get(app.id)! };
+          }
+          return app;
+        });
+
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
+      }
+      localStorage.setItem(MIGRATION_NEWEST_PIN_ORDER_KEY, 'true');
+    } catch (e) {
+      console.error('Migration failed:', e);
+    }
+  }
+
   static getApps(): AppItem[] {
+    this.migrateNewestFirst();
     try {
       const raw = localStorage.getItem(STORAGE_KEY);
       if (!raw) {
@@ -135,7 +174,14 @@ export class AppRepository {
   static addApp(app: Omit<AppItem, 'id' | 'createdAt' | 'launchCount' | 'lastOpenedAt' | 'pinOrder'> & { id?: string; pinOrder?: number }): AppItem {
     const apps = this.getApps();
     const newId = app.id || `app-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`;
-    const highestPinOrder = apps.filter(a => a.pinned).reduce((max, a) => Math.max(max, a.pinOrder), -1);
+
+    // Shift all currently pinned apps up by 1 so the new app is inserted in the 1st location (slot 0)
+    const shiftedApps = apps.map(existing => {
+      if (app.pinned && existing.pinned) {
+        return { ...existing, pinOrder: (existing.pinOrder ?? 0) + 1 };
+      }
+      return existing;
+    });
 
     const newApp: AppItem = {
       ...app,
@@ -143,10 +189,10 @@ export class AppRepository {
       createdAt: Date.now(),
       launchCount: 0,
       lastOpenedAt: null,
-      pinOrder: app.pinned ? highestPinOrder + 1 : 9999,
+      pinOrder: app.pinned ? 0 : 9999,
     };
 
-    const updated = [newApp, ...apps];
+    const updated = [newApp, ...shiftedApps];
     this.saveApps(updated);
     return newApp;
   }
@@ -179,10 +225,20 @@ export class AppRepository {
     if (!app) return null;
 
     const willBePinned = !app.pinned;
-    const highestPinOrder = apps.filter(a => a.pinned).reduce((max, a) => Math.max(max, a.pinOrder), -1);
 
-    app.pinned = willBePinned;
-    app.pinOrder = willBePinned ? highestPinOrder + 1 : 9999;
+    if (willBePinned) {
+      // Put at 1st location (pinOrder: 0) and shift existing pinned apps
+      apps.forEach(a => {
+        if (a.pinned) {
+          a.pinOrder = (a.pinOrder ?? 0) + 1;
+        }
+      });
+      app.pinned = true;
+      app.pinOrder = 0;
+    } else {
+      app.pinned = false;
+      app.pinOrder = 9999;
+    }
 
     this.saveApps(apps);
     return app;
