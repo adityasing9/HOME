@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useApp } from '../../context/AppContext';
-import { Settings, Download, WifiOff, Sun, Moon } from 'lucide-react';
+import { Settings, Download, WifiOff, Sun, Moon, QrCode } from 'lucide-react';
 
 export const Header: React.FC = () => {
   const {
@@ -9,6 +9,7 @@ export const Header: React.FC = () => {
     installPwa,
     setIsSettingsOpen,
     setIsGitHubImportOpen,
+    openQRModal,
     settings,
     updateSettings,
     setActiveView,
@@ -119,6 +120,17 @@ export const Header: React.FC = () => {
           ) : (
             <Moon className="w-4 h-4 text-indigo-500" />
           )}
+        </button>
+
+        {/* QR Code Sync & Scanner */}
+        <button
+          onClick={() => openQRModal('export')}
+          className="flex items-center gap-1.5 px-2 py-1.5 sm:px-2.5 sm:py-2 rounded-xl glass-subtle border-subtle text-muted hover:text-main hover-tile transition-all shadow-sm group"
+          title="QR Code Sync & Camera Import"
+          aria-label="QR Code Sync"
+        >
+          <QrCode className="w-4 h-4 group-hover:text-accent transition-colors" />
+          <span className="hidden sm:inline text-xs font-medium">QR Sync</span>
         </button>
 
         {/* GitHub Repositories Link Importer */}

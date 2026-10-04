@@ -393,3 +393,26 @@
   user-select: none !important;
   -webkit-user-select: none !important;
 }
+
+/* ========================================================
+   QR SCANNER LASER ANIMATION
+   ======================================================== */
+@keyframes qr-scan-laser {
+  0% {
+    top: 6%;
+    opacity: 0.7;
+  }
+  50% {
+    top: 92%;
+    opacity: 1;
+  }
+  100% {
+    top: 6%;
+    opacity: 0.7;
+  }
+}
+
+.animate-scan-laser {
+  animation: qr-scan-laser 2.2s ease-in-out infinite;
+}
+

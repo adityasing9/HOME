@@ -29,6 +29,8 @@ import {
   Image as ImageIcon,
   Sparkles,
   Loader2,
+  QrCode,
+  Camera,
 } from 'lucide-react';
 
 type SettingsTab =
@@ -46,6 +48,7 @@ export const SettingsModal: React.FC = () => {
     isSettingsOpen,
     setIsSettingsOpen,
     setIsGitHubImportOpen,
+    openQRModal,
     apps,
     settings,
     updateSettings,
@@ -861,8 +864,49 @@ export const SettingsModal: React.FC = () => {
             {/* 7. BACKUP & RESTORE TAB */}
             {activeTab === 'backup' && (
               <div className="space-y-4">
+                {/* QR Code Sync & Transfer Card */}
+                <div className="p-4 rounded-2xl glass-subtle border border-accent/25 bg-accent-light/30 space-y-3">
+                  <div className="flex items-center gap-2.5">
+                    <div className="p-2 rounded-xl bg-accent text-white shadow-sm shadow-accent/20">
+                      <QrCode className="w-4 h-4" />
+                    </div>
+                    <div>
+                      <div className="text-xs font-bold text-main">QR Code Sync & Camera Transfer</div>
+                      <div className="text-[11px] text-muted">
+                        Export your setup as a QR code or scan with your device's camera to import
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="flex flex-wrap items-center gap-2 pt-1">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setIsSettingsOpen(false);
+                        openQRModal('export');
+                      }}
+                      className="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-accent text-white text-xs font-bold hover:bg-accent-hover transition-colors shadow-sm"
+                    >
+                      <QrCode className="w-3.5 h-3.5" />
+                      <span>Generate QR Code</span>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setIsSettingsOpen(false);
+                        openQRModal('scan');
+                      }}
+                      className="flex items-center gap-2 px-3.5 py-2 rounded-xl glass-subtle hover-tile border-subtle text-main text-xs font-bold transition-colors"
+                    >
+                      <Camera className="w-3.5 h-3.5 text-accent" />
+                      <span>Scan with Camera / Image</span>
+                    </button>
+                  </div>
+                </div>
+
                 <div className="p-4 rounded-2xl glass-subtle border-subtle space-y-2">
-                  <div className="text-xs font-bold text-main">Export Backup</div>
+                  <div className="text-xs font-bold text-main">Export Backup (JSON)</div>
                   <p className="text-xs text-muted">
                     Download a complete JSON snapshot containing all your registered apps, pinned state, custom ordering, and visual preferences.
                   </p>

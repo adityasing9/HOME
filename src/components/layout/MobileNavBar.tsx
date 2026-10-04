@@ -1,9 +1,9 @@
 import React from 'react';
 import { useApp } from '../../context/AppContext';
-import { Home, LayoutGrid, Star, Settings } from 'lucide-react';
+import { Home, LayoutGrid, Star, Settings, QrCode } from 'lucide-react';
 
 export const MobileNavBar: React.FC = () => {
-  const { activeView, setActiveView, setIsSettingsOpen } = useApp();
+  const { activeView, setActiveView, setIsSettingsOpen, openQRModal } = useApp();
 
   return (
     <nav className="md:hidden fixed bottom-0 left-0 right-0 z-40 home-bottom-shelf backdrop-blur-xl px-3 py-2 pb-[max(8px,env(safe-area-inset-bottom))] flex items-center justify-around shadow-2xl">
@@ -41,6 +41,15 @@ export const MobileNavBar: React.FC = () => {
       >
         <Star className="w-5 h-5" />
         <span className="text-[10px]">Favorites</span>
+      </button>
+
+      <button
+        onClick={() => openQRModal('scan')}
+        className="flex flex-col items-center gap-1 py-1 px-3 rounded-xl text-muted hover:text-main transition-colors"
+        title="Scan QR Code"
+      >
+        <QrCode className="w-5 h-5 text-accent" />
+        <span className="text-[10px]">QR Scan</span>
       </button>
 
       <button

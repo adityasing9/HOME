@@ -15,12 +15,13 @@ import {
   Pin,
   ExternalLink,
   Loader2,
+  QrCode,
 } from 'lucide-react';
 
 const COMMON_EMOJIS = ['🧠', '⚡', '💻', '🛠️', '🔬', '📊', '🌐', '🎮', '🎵', '📚', '🚀', '🔑', '📱', '🤖', '💡', '💰', '🛡️', '📦'];
 
 export const AddAppModal: React.FC = () => {
-  const { isAddAppOpen, setIsAddAppOpen, setIsGitHubImportOpen, addApp, launchApp, showToast } = useApp();
+  const { isAddAppOpen, setIsAddAppOpen, setIsGitHubImportOpen, openQRModal, addApp, launchApp, showToast } = useApp();
 
   const [name, setName] = useState('');
   const [url, setUrl] = useState('');
@@ -390,6 +391,19 @@ export const AddAppModal: React.FC = () => {
                     <span>Fetch Logo</span>
                   </>
                 )}
+              </button>
+
+              <button
+                type="button"
+                onClick={() => {
+                  setIsAddAppOpen(false);
+                  openQRModal('scan');
+                }}
+                className="flex items-center gap-1.5 px-3 py-2 rounded-xl glass-subtle border-subtle text-muted hover:text-main hover-tile font-semibold text-xs transition-colors flex-shrink-0"
+                title="Scan app URL from a QR code"
+              >
+                <QrCode className="w-3.5 h-3.5 text-accent" />
+                <span className="hidden sm:inline">Scan QR</span>
               </button>
             </div>
             {urlError && <p className="text-[11px] text-rose-400 mt-1">{urlError}</p>}

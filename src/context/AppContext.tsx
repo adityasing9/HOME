@@ -35,6 +35,14 @@ interface AppContextType {
   setEditingApp: (app: AppItem | null) => void;
   isSettingsOpen: boolean;
   setIsSettingsOpen: (open: boolean) => void;
+  isQROpen: boolean;
+  setIsQROpen: (open: boolean) => void;
+  qrInitialTab: 'export' | 'scan';
+  setQRInitialTab: (tab: 'export' | 'scan') => void;
+  qrTargetApp: AppItem | null;
+  setQRTargetApp: (app: AppItem | null) => void;
+  openQRModal: (tab?: 'export' | 'scan', targetApp?: AppItem | null) => void;
+  importAppsFromQR: (newApps: AppItem[], mode: 'merge' | 'replace', newSettings?: Partial<UserSettings>) => void;
   launchApp: (app: AppItem) => void;
   addApp: (appData: Omit<AppItem, 'id' | 'createdAt' | 'launchCount' | 'lastOpenedAt' | 'pinOrder'> & { id?: string; pinOrder?: number }) => AppItem;
   addMultipleApps: (appsData: Array<Omit<AppItem, 'id' | 'createdAt' | 'launchCount' | 'lastOpenedAt' | 'pinOrder'> & { id?: string; pinOrder?: number }>) => AppItem[];
@@ -71,6 +79,9 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [isGitHubImportOpen, setIsGitHubImportOpen] = useState(false);
   const [editingApp, setEditingApp] = useState<AppItem | null>(null);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const [isQROpen, setIsQROpen] = useState(false);
+  const [qrInitialTab, setQRInitialTab] = useState<'export' | 'scan'>('export');
+  const [qrTargetApp, setQRTargetApp] = useState<AppItem | null>(null);
   const [toasts, setToasts] = useState<ToastMessage[]>([]);
   const [isOnline, setIsOnline] = useState<boolean>(navigator.onLine);
   const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null);
@@ -267,6 +278,65 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     setDeferredPrompt(null);
   }, [deferredPrompt, showToast]);
 
+  const openQRModal = useCallback((tab: 'export' | 'scan' = 'export', targetApp: AppItem | null = null) => {
+    setQRInitialTab(tab);
+    setQRTargetApp(targetApp);
+    setIsQROpen(true);
+  }, []);
+
+  const importAppsFromQR = useCallback((newApps: AppItem[], mode: 'merge' | 'replace', newSettings?: Partial<UserSettings>) => {
+    if (mode === 'replace') {
+      AppRepository.saveApps(newApps);
+      if (newSettings) {
+        SettingsRepository.saveSettings(newSettings);
+        setSettings(SettingsRepository.getSettings());
+      }
+      refreshApps();
+      showToast(`Imported ${newApps.length} apps from QR setup!`, 'success');
+    } else {
+      // Merge mode
+      const current = AppRepository.getApps();
+      const existingUrls = new Set(current.map(a => a.url.toLowerCase().trim().replace(/\/$/, '')));
+      const toAdd: AppItem[] = [];
+
+      newApps.forEach(item => {
+        const cleanUrl = item.url.toLowerCase().trim().replace(/\/$/, '');
+        if (!existingUrls.has(cleanUrl)) {
+          toAdd.push(item);
+          existingUrls.add(cleanUrl);
+        }
+      });
+
+      const merged = [...current, ...toAdd];
+      AppRepository.saveApps(merged);
+      if (newSettings) {
+        SettingsRepository.saveSettings(newSettings);
+        setSettings(SettingsRepository.getSettings());
+      }
+      refreshApps();
+      showToast(
+        toAdd.length > 0
+          ? `Added ${toAdd.length} new app(s) from QR scan!`
+          : `All ${newApps.length} app(s) already exist in your launcher.`,
+        'success'
+      );
+    }
+  }, [refreshApps, showToast]);
+
+  // Automatic Hash-based QR import detector (#import=... or #sync=...)
+  useEffect(() => {
+    const handleHash = () => {
+      const hash = window.location.hash;
+      if (hash.includes('#import=') || hash.includes('#sync=')) {
+        setQRInitialTab('scan');
+        setIsQROpen(true);
+      }
+    };
+    handleHash();
+    window.addEventListener('hashchange', handleHash);
+    return () => window.removeEventListener('hashchange', handleHash);
+  }, []);
+
   // Global keyboard shortcuts
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -281,6 +351,10 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
       // Escape -> close open modals or back to home
       if (e.key === 'Escape') {
+        if (isQROpen) {
+          setIsQROpen(false);
+          return;
+        }
         if (isGitHubImportOpen) {
           setIsGitHubImportOpen(false);
           return;
@@ -315,7 +389,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isAddAppOpen, isGitHubImportOpen, editingApp, isSettingsOpen, searchQuery, activeView]);
+  }, [isQROpen, isAddAppOpen, isGitHubImportOpen, editingApp, isSettingsOpen, searchQuery, activeView]);
 
   const value = useMemo<AppContextType>(() => ({
     apps,
@@ -338,6 +412,14 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     setEditingApp,
     isSettingsOpen,
     setIsSettingsOpen,
+    isQROpen,
+    setIsQROpen,
+    qrInitialTab,
+    setQRInitialTab,
+    qrTargetApp,
+    setQRTargetApp,
+    openQRModal,
+    importAppsFromQR,
     launchApp,
     addApp,
     addMultipleApps,
@@ -370,6 +452,11 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     isGitHubImportOpen,
     editingApp,
     isSettingsOpen,
+    isQROpen,
+    qrInitialTab,
+    qrTargetApp,
+    openQRModal,
+    importAppsFromQR,
     launchApp,
     addApp,
     addMultipleApps,

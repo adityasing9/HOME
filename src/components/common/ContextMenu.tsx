@@ -14,6 +14,7 @@ import {
   ArrowLeft,
   ArrowRight,
   Sparkles,
+  QrCode,
 } from 'lucide-react';
 
 export interface AnchorRect {
@@ -49,6 +50,7 @@ export const ContextMenu: React.FC<ContextMenuProps> = ({
     setEditingApp,
     deleteApp,
     updateApp,
+    openQRModal,
     showToast,
     refreshApps,
   } = useApp();
@@ -323,6 +325,19 @@ export const ContextMenu: React.FC<ContextMenuProps> = ({
         >
           <Sparkles className="w-3.5 h-3.5 text-accent" />
           <span>Fetch PWA logo</span>
+        </button>
+
+        {/* Share App via QR Code */}
+        <button
+          type="button"
+          onClick={() => {
+            openQRModal('export', app);
+            onClose();
+          }}
+          className="w-full flex items-center gap-2.5 px-3 py-1.5 text-left text-main hover-tile transition-colors"
+        >
+          <QrCode className="w-3.5 h-3.5 text-sky-500" />
+          <span>Share QR Code</span>
         </button>
 
         {/* Edit App */}
