@@ -23,7 +23,8 @@ export const PinnedApps: React.FC = () => {
 
   const [contextMenuState, setContextMenuState] = useState<{
     app: AppItem;
-    position: { x: number; y: number };
+    anchorRect?: { top: number; bottom: number; left: number; right: number; width: number; height: number };
+    position?: { x: number; y: number };
     index: number;
   } | null>(null);
 
@@ -85,10 +86,18 @@ export const PinnedApps: React.FC = () => {
 
   const openButtonContextMenu = (e: React.MouseEvent, app: AppItem, index: number) => {
     e.stopPropagation();
-    const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
+    const btn = (e.currentTarget as HTMLElement) || (e.target as HTMLElement)?.closest('button');
+    const rect = btn ? btn.getBoundingClientRect() : (e.target as HTMLElement).getBoundingClientRect();
     setContextMenuState({
       app,
-      position: { x: rect.left, y: rect.bottom + 4 },
+      anchorRect: {
+        top: rect.top,
+        bottom: rect.bottom,
+        left: rect.left,
+        right: rect.right,
+        width: rect.width,
+        height: rect.height,
+      },
       index,
     });
   };
@@ -184,6 +193,7 @@ export const PinnedApps: React.FC = () => {
       {contextMenuState && (
         <ContextMenu
           app={contextMenuState.app}
+          anchorRect={contextMenuState.anchorRect}
           position={contextMenuState.position}
           onClose={() => setContextMenuState(null)}
           onMoveLeft={

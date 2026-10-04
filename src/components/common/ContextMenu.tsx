@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { CATEGORIES, type AppItem } from '../../types';
 import { useApp } from '../../context/AppContext';
@@ -14,9 +14,19 @@ import {
   ArrowRight,
 } from 'lucide-react';
 
-interface ContextMenuProps {
+export interface AnchorRect {
+  top: number;
+  bottom: number;
+  left: number;
+  right: number;
+  width?: number;
+  height?: number;
+}
+
+export interface ContextMenuProps {
   app: AppItem;
-  position: { x: number; y: number };
+  anchorRect?: AnchorRect | null;
+  position?: { x: number; y: number } | null;
   onClose: () => void;
   onMoveLeft?: () => void;
   onMoveRight?: () => void;
@@ -24,6 +34,7 @@ interface ContextMenuProps {
 
 export const ContextMenu: React.FC<ContextMenuProps> = ({
   app,
+  anchorRect,
   position,
   onClose,
   onMoveLeft,
@@ -32,6 +43,84 @@ export const ContextMenu: React.FC<ContextMenuProps> = ({
   const { launchApp, togglePin, toggleFavorite, setEditingApp, deleteApp, updateApp } = useApp();
   const menuRef = useRef<HTMLDivElement>(null);
   const [showCategorySubmenu, setShowCategorySubmenu] = useState(false);
+
+  // Position calculation: anchors right beside the 3-dots button, never clipping or floating at screen bottom
+  const computePosition = (menuW = 224, menuH = 310) => {
+    if (typeof window === 'undefined') {
+      return { left: 16, top: 16, flipSubmenuLeft: false, flipSubmenuUp: false };
+    }
+
+    const viewportW = window.innerWidth;
+    const viewportH = window.innerHeight;
+    const margin = 12;
+
+    let targetLeft: number;
+    let targetTop: number;
+
+    if (anchorRect) {
+      // Anchored to the 3-dots button:
+      // Primary: place menu to the left of the button so it sits directly beside it
+      const leftAside = anchorRect.left - menuW - 6;
+      // Secondary: place menu to the right of the button if room allows
+      const rightAside = anchorRect.right + 6;
+
+      if (leftAside >= margin) {
+        targetLeft = leftAside;
+      } else if (rightAside + menuW <= viewportW - margin) {
+        targetLeft = rightAside;
+      } else {
+        // Narrow screen fallback: align right edge with trigger button
+        targetLeft = anchorRect.right - menuW;
+      }
+
+      // Vertical anchoring:
+      // Start aligned with the top of the 3-dots button
+      const topAligned = anchorRect.top - 4;
+      if (topAligned + menuH <= viewportH - margin) {
+        targetTop = topAligned;
+      } else {
+        // If opening downward would exceed viewport, flip upward aligned with bottom of button
+        targetTop = anchorRect.bottom - menuH + 4;
+      }
+    } else {
+      // Pointer / right-click fallback
+      const px = position?.x ?? margin;
+      const py = position?.y ?? margin;
+
+      if (px + menuW > viewportW - margin) {
+        targetLeft = px - menuW;
+      } else {
+        targetLeft = px;
+      }
+
+      if (py + menuH > viewportH - margin) {
+        targetTop = py - menuH;
+      } else {
+        targetTop = py;
+      }
+    }
+
+    // Viewport boundary clamps
+    const clampedLeft = Math.max(margin, Math.min(targetLeft, viewportW - menuW - margin));
+    const clampedTop = Math.max(margin, Math.min(targetTop, viewportH - menuH - margin));
+
+    const submenuW = 160;
+    const flipSubmenuLeft = clampedLeft + menuW + submenuW > viewportW - margin;
+    const flipSubmenuUp = clampedTop + 200 > viewportH - margin;
+
+    return { left: clampedLeft, top: clampedTop, flipSubmenuLeft, flipSubmenuUp };
+  };
+
+  const [coords, setCoords] = useState(() => computePosition(224, 310));
+
+  useLayoutEffect(() => {
+    if (menuRef.current) {
+      const rect = menuRef.current.getBoundingClientRect();
+      const actualW = rect.width || 224;
+      const actualH = rect.height || 310;
+      setCoords(computePosition(actualW, actualH));
+    }
+  }, [anchorRect, position?.x, position?.y]);
 
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
@@ -42,38 +131,32 @@ export const ContextMenu: React.FC<ContextMenuProps> = ({
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') onClose();
     };
+    const handleScrollOrResize = () => {
+      onClose();
+    };
 
-    // Small delay to ensure the opening click event does not instantly trigger close
+    // Small delay so opening click doesn't instantly dismiss
     const timer = setTimeout(() => {
       window.addEventListener('mousedown', handleClickOutside);
       window.addEventListener('keydown', handleKeyDown);
+      window.addEventListener('scroll', handleScrollOrResize, { passive: true });
+      window.addEventListener('resize', handleScrollOrResize);
     }, 50);
 
     return () => {
       clearTimeout(timer);
       window.removeEventListener('mousedown', handleClickOutside);
       window.removeEventListener('keydown', handleKeyDown);
+      window.removeEventListener('scroll', handleScrollOrResize);
+      window.removeEventListener('resize', handleScrollOrResize);
     };
   }, [onClose]);
-
-  const menuWidth = 224;
-  const menuHeight = 310;
-  
-  // Smart boundary checks: clamp within viewport margins so it never clips off right or bottom
-  const maxLeft = typeof window !== 'undefined' ? window.innerWidth - menuWidth - 16 : 300;
-  const maxTop = typeof window !== 'undefined' ? window.innerHeight - menuHeight - 16 : 300;
-
-  const left = Math.max(16, Math.min(position.x, maxLeft));
-  const top = Math.max(16, Math.min(position.y, maxTop));
-
-  const submenuWidth = 160;
-  const flipSubmenuLeft = typeof window !== 'undefined' && left + menuWidth + submenuWidth > window.innerWidth - 16;
 
   return createPortal(
     <div
       ref={menuRef}
-      style={{ left: `${left}px`, top: `${top}px` }}
-      className="fixed z-[9999] w-56 py-1.5 rounded-2xl home-panel-window border-subtle shadow-2xl text-xs font-medium text-main animate-in fade-in zoom-in-95 duration-150 backdrop-blur-2xl"
+      style={{ left: `${coords.left}px`, top: `${coords.top}px` }}
+      className="fixed z-[9999] w-56 py-1.5 rounded-2xl home-panel-window border-subtle shadow-2xl text-xs font-medium text-main animate-in fade-in zoom-in-95 duration-150 backdrop-blur-2xl max-h-[calc(100vh-24px)] overflow-y-auto"
     >
       {/* App Header Preview */}
       <div className="px-3 py-2 border-b border-subtle mb-1 flex items-center justify-between">
@@ -180,8 +263,10 @@ export const ContextMenu: React.FC<ContextMenuProps> = ({
 
         {showCategorySubmenu && (
           <div
-            className={`absolute top-0 py-1.5 w-40 max-h-48 overflow-y-auto rounded-xl home-panel-window border-subtle shadow-2xl text-xs z-50 ${
-              flipSubmenuLeft ? 'right-full mr-1' : 'left-full ml-1'
+            className={`absolute ${
+              coords.flipSubmenuUp ? 'bottom-0' : 'top-0'
+            } py-1.5 w-40 max-h-48 overflow-y-auto rounded-xl home-panel-window border-subtle shadow-2xl text-xs z-50 ${
+              coords.flipSubmenuLeft ? 'right-full mr-1' : 'left-full ml-1'
             }`}
           >
             {CATEGORIES.map(cat => (
