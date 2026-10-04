@@ -202,6 +202,16 @@ export class AppRepository {
     const index = apps.findIndex(a => a.id === id);
     if (index === -1) return null;
 
+    if (updates.icon) {
+      const failed = this.getFailedIcons();
+      if (failed.has(updates.icon)) {
+        failed.delete(updates.icon);
+        try {
+          localStorage.setItem(FAILED_ICONS_KEY, JSON.stringify(Array.from(failed)));
+        } catch {}
+      }
+    }
+
     const existing = apps[index];
     const updatedApp = { ...existing, ...updates };
     apps[index] = updatedApp;

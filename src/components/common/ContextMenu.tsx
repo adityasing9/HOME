@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { CATEGORIES, type AppItem } from '../../types';
 import { useApp } from '../../context/AppContext';
+import { PwaDetectionService } from '../../services/pwaDetectionService';
 import {
   ExternalLink,
   Pin,
@@ -12,6 +13,7 @@ import {
   FolderInput,
   ArrowLeft,
   ArrowRight,
+  Sparkles,
 } from 'lucide-react';
 
 export interface AnchorRect {
@@ -40,7 +42,16 @@ export const ContextMenu: React.FC<ContextMenuProps> = ({
   onMoveLeft,
   onMoveRight,
 }) => {
-  const { launchApp, togglePin, toggleFavorite, setEditingApp, deleteApp, updateApp } = useApp();
+  const {
+    launchApp,
+    togglePin,
+    toggleFavorite,
+    setEditingApp,
+    deleteApp,
+    updateApp,
+    showToast,
+    refreshApps,
+  } = useApp();
   const [showCategorySubmenu, setShowCategorySubmenu] = useState(false);
 
   // Close cleanly on Escape key
@@ -289,6 +300,30 @@ export const ContextMenu: React.FC<ContextMenuProps> = ({
             </div>
           )}
         </div>
+
+        {/* Fetch / Refresh PWA Logo */}
+        <button
+          type="button"
+          onClick={async () => {
+            onClose();
+            showToast(`Searching PWA logo for ${app.name}...`, 'info');
+            try {
+              const updated = await PwaDetectionService.updateAppWithPwaLogo(app);
+              if (updated) {
+                showToast(`PWA logo updated for ${app.name}!`, 'success');
+                refreshApps();
+              } else {
+                showToast(`No high-res PWA logo found for ${app.name}`, 'warning');
+              }
+            } catch {
+              showToast(`Failed to detect logo for ${app.name}`, 'error');
+            }
+          }}
+          className="w-full flex items-center gap-2.5 px-3 py-1.5 text-left text-main hover-tile transition-colors"
+        >
+          <Sparkles className="w-3.5 h-3.5 text-accent" />
+          <span>Fetch PWA logo</span>
+        </button>
 
         {/* Edit App */}
         <button

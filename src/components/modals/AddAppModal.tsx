@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useApp } from '../../context/AppContext';
 import { CATEGORIES, type DefaultCategory } from '../../types';
 import { AppRepository } from '../../services/appRepository';
+import { PwaDetectionService, type PwaIconCandidate } from '../../services/pwaDetectionService';
 import { AppIcon } from '../common/AppIcon';
 import {
   X,
@@ -13,6 +14,7 @@ import {
   AlertTriangle,
   Pin,
   ExternalLink,
+  Loader2,
 } from 'lucide-react';
 
 const COMMON_EMOJIS = ['🧠', '⚡', '💻', '🛠️', '🔬', '📊', '🌐', '🎮', '🎵', '📚', '🚀', '🔑', '📱', '🤖', '💡', '💰', '🛡️', '📦'];
@@ -33,6 +35,12 @@ export const AddAppModal: React.FC = () => {
   const [selectedEmoji, setSelectedEmoji] = useState('⚡');
   const [customIconUrl, setCustomIconUrl] = useState('');
   const [uploadedImageData, setUploadedImageData] = useState('');
+
+  // PWA Auto-Detection states
+  const [isDetecting, setIsDetecting] = useState(false);
+  const [iconCandidates, setIconCandidates] = useState<PwaIconCandidate[]>([]);
+  const [detectionMessage, setDetectionMessage] = useState('');
+  const debounceTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Validation & Duplicate states
   const [urlError, setUrlError] = useState('');
@@ -55,13 +63,66 @@ export const AddAppModal: React.FC = () => {
       setSelectedEmoji('⚡');
       setCustomIconUrl('');
       setUploadedImageData('');
+      setIsDetecting(false);
+      setIconCandidates([]);
+      setDetectionMessage('');
       setUrlError('');
       setNameError('');
       setDuplicateApp(null);
     }
   }, [isAddAppOpen]);
 
-  // Attempt client-side metadata auto-detection when URL is typed
+  useEffect(() => {
+    return () => {
+      if (debounceTimerRef.current) clearTimeout(debounceTimerRef.current);
+    };
+  }, []);
+
+  // Perform active client-side PWA detection
+  const handleDetectPwa = async (targetUrl?: string) => {
+    const rawTarget = (targetUrl !== undefined ? targetUrl : url).trim();
+    if (rawTarget.length < 4) {
+      showToast('Please enter a web URL first', 'warning');
+      return;
+    }
+
+    setIsDetecting(true);
+    setDetectionMessage('Probing PWA webmanifest & icons...');
+
+    try {
+      const res = await PwaDetectionService.detectPwa(rawTarget);
+
+      // Auto-populate name if empty or generic
+      if (res.name && (!name.trim() || name === 'App')) {
+        setName(res.name);
+      }
+
+      // Auto-populate description if empty
+      if (res.description && !description.trim()) {
+        setDescription(res.description);
+      }
+
+      if (res.icons.length > 0) {
+        setIconCandidates(res.icons);
+        if (res.bestIcon) {
+          setDetectedIconUrl(res.bestIcon);
+          setIconMode('detected');
+        }
+        setDetectionMessage(`Found ${res.icons.length} PWA icon(s)`);
+        showToast(`Discovered ${res.icons.length} PWA logo option(s)!`, 'success');
+      } else {
+        setDetectionMessage('No PWA icons reachable');
+        showToast('No PWA manifest icons reachable. You can pick an emoji or upload an image.', 'info');
+      }
+    } catch {
+      setDetectionMessage('Probe error');
+      showToast('Failed to probe PWA endpoints', 'error');
+    } finally {
+      setIsDetecting(false);
+    }
+  };
+
+  // Client-side metadata auto-detection when URL is typed
   const handleUrlChange = (newUrl: string) => {
     setUrl(newUrl);
     setUrlError('');
@@ -74,14 +135,21 @@ export const AddAppModal: React.FC = () => {
         setDuplicateApp({ id: duplicate.id, name: duplicate.name });
       }
 
-      // Metadata extraction
+      // Quick fallback metadata
       const meta = AppRepository.extractMetadataFromUrl(newUrl);
-      if (meta.domain) {
-        if (!name.trim()) {
-          setName(meta.name);
-        }
-        setDetectedIconUrl(meta.iconUrl);
+      if (meta.domain && !name.trim()) {
+        setName(meta.name);
       }
+
+      // Debounce PWA detection (650ms)
+      if (debounceTimerRef.current) {
+        clearTimeout(debounceTimerRef.current);
+      }
+      debounceTimerRef.current = setTimeout(() => {
+        if (newUrl.trim().length > 7 && (newUrl.includes('.') || newUrl.includes('localhost'))) {
+          handleDetectPwa(newUrl);
+        }
+      }, 650);
     }
   };
 
@@ -252,20 +320,48 @@ export const AddAppModal: React.FC = () => {
 
           {/* URL Input with Auto-detection */}
           <div>
-            <label className="block text-xs font-semibold text-main mb-1.5">
-              Application Web URL <span className="text-rose-400">*</span>
-            </label>
-            <div className="relative">
-              <Globe className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted" />
-              <input
-                type="text"
-                value={url}
-                onChange={e => handleUrlChange(e.target.value)}
-                placeholder="https://yourapp.com"
-                className={`w-full pl-9 pr-3 py-2 rounded-xl home-input text-xs sm:text-sm ${
-                  urlError ? 'border-rose-500 focus:ring-rose-500' : ''
-                }`}
-              />
+            <div className="flex items-center justify-between mb-1.5">
+              <label className="text-xs font-semibold text-main">
+                Application Web URL <span className="text-rose-400">*</span>
+              </label>
+              {detectionMessage && (
+                <span className="text-[11px] text-accent font-medium truncate max-w-[210px]">
+                  {detectionMessage}
+                </span>
+              )}
+            </div>
+            <div className="flex gap-2">
+              <div className="relative flex-1">
+                <Globe className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted" />
+                <input
+                  type="text"
+                  value={url}
+                  onChange={e => handleUrlChange(e.target.value)}
+                  placeholder="https://yourapp.com or app.vercel.app"
+                  className={`w-full pl-9 pr-3 py-2 rounded-xl home-input text-xs sm:text-sm ${
+                    urlError ? 'border-rose-500 focus:ring-rose-500' : ''
+                  }`}
+                />
+              </div>
+              <button
+                type="button"
+                onClick={() => handleDetectPwa()}
+                disabled={isDetecting || !url.trim()}
+                className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-accent text-white hover:bg-accent-hover font-semibold text-xs transition-colors shadow-sm disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap flex-shrink-0"
+                title="Fetch PWA manifest & logo"
+              >
+                {isDetecting ? (
+                  <>
+                    <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                    <span className="hidden sm:inline">Detecting...</span>
+                  </>
+                ) : (
+                  <>
+                    <Sparkles className="w-3.5 h-3.5" />
+                    <span>Fetch Logo</span>
+                  </>
+                )}
+              </button>
             </div>
             {urlError && <p className="text-[11px] text-rose-400 mt-1">{urlError}</p>}
           </div>
@@ -339,9 +435,63 @@ export const AddAppModal: React.FC = () => {
 
           {/* Icon Selection Tabs */}
           <div>
-            <label className="block text-xs font-semibold text-main mb-1.5">
-              App Icon
-            </label>
+            <div className="flex items-center justify-between mb-1.5">
+              <label className="text-xs font-semibold text-main">
+                App Icon
+              </label>
+              {iconMode === 'detected' && detectedIconUrl && (
+                <span className="text-[11px] text-emerald-400 font-medium flex items-center gap-1">
+                  ✓ High-res PWA icon selected
+                </span>
+              )}
+            </div>
+
+            {/* Candidate Icons Picker */}
+            {iconCandidates.length > 0 && (
+              <div className="p-3 rounded-2xl glass-subtle border-subtle mb-3">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-[11px] font-semibold text-accent flex items-center gap-1.5">
+                    <Sparkles className="w-3 h-3" />
+                    {iconCandidates.length} Detected PWA Icon{iconCandidates.length > 1 ? 's' : ''}
+                  </span>
+                  <span className="text-[10px] text-muted">Click to select</span>
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  {iconCandidates.map((cand, idx) => {
+                    const isSelected = iconMode === 'detected' && detectedIconUrl === cand.url;
+                    return (
+                      <button
+                        key={idx}
+                        type="button"
+                        onClick={() => {
+                          setDetectedIconUrl(cand.url);
+                          setIconMode('detected');
+                        }}
+                        className={`flex items-center gap-2 p-1.5 pr-2.5 rounded-xl border text-xs transition-all ${
+                          isSelected
+                            ? 'bg-accent/20 border-accent text-main font-semibold shadow-sm ring-1 ring-accent'
+                            : 'glass-subtle border-subtle text-muted hover:text-main'
+                        }`}
+                      >
+                        <div className="w-6 h-6 rounded-lg bg-black/10 dark:bg-white/10 overflow-hidden flex items-center justify-center flex-shrink-0">
+                          <img
+                            src={cand.url}
+                            alt={cand.label}
+                            className="w-5 h-5 object-contain"
+                            loading="lazy"
+                          />
+                        </div>
+                        <div className="text-left">
+                          <div className="text-[11px] leading-tight truncate max-w-[120px]">{cand.label}</div>
+                          {cand.sizes && <div className="text-[9px] text-muted">{cand.sizes}</div>}
+                        </div>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+
             <div className="flex items-center gap-1 p-1 rounded-xl glass-subtle border-subtle text-xs mb-3 overflow-x-auto">
               {detectedIconUrl && (
                 <button

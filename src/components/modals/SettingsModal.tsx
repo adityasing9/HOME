@@ -10,6 +10,8 @@ import type {
 } from '../../types';
 import { SettingsRepository } from '../../services/settingsRepository';
 import { BackupService } from '../../services/backupService';
+import { AppRepository } from '../../services/appRepository';
+import { PwaDetectionService } from '../../services/pwaDetectionService';
 import {
   X,
   Palette,
@@ -25,6 +27,8 @@ import {
   Trash2,
   Check,
   Image as ImageIcon,
+  Sparkles,
+  Loader2,
 } from 'lucide-react';
 
 type SettingsTab =
@@ -41,6 +45,7 @@ export const SettingsModal: React.FC = () => {
   const {
     isSettingsOpen,
     setIsSettingsOpen,
+    apps,
     settings,
     updateSettings,
     clearActivity,
@@ -54,8 +59,87 @@ export const SettingsModal: React.FC = () => {
   const [showResetConfirm, setShowResetConfirm] = useState(false);
   const [storageInfo, setStorageInfo] = useState(() => SettingsRepository.getStorageBreakdown());
 
+  // Batch PWA logo upgrade states
+  const [isBatchScanning, setIsBatchScanning] = useState(false);
+  const [batchProgress, setBatchProgress] = useState<{
+    current: number;
+    total: number;
+    appName: string;
+  } | null>(null);
+
   const wallpaperInputRef = useRef<HTMLInputElement>(null);
   const backupInputRef = useRef<HTMLInputElement>(null);
+
+  const failedIcons = AppRepository.getFailedIcons();
+  const missingLogoCount = apps.filter(
+    a =>
+      !a.icon ||
+      a.iconType === 'letter' ||
+      failedIcons.has(a.icon) ||
+      a.icon.includes('google.com/s2/favicons')
+  ).length;
+
+  const handleBatchUpgradeMissing = async () => {
+    if (isBatchScanning) return;
+    setIsBatchScanning(true);
+    setBatchProgress(null);
+    showToast('Starting PWA logo scan for missing icons...', 'info');
+
+    try {
+      const res = await PwaDetectionService.autoUpgradeAllMissingLogos(
+        apps,
+        (current, total, appName) => {
+          setBatchProgress({ current, total, appName });
+        },
+        false
+      );
+
+      refreshApps();
+      if (res.updatedCount > 0) {
+        showToast(`Successfully upgraded ${res.updatedCount} PWA logo(s)!`, 'success');
+      } else {
+        showToast('All apps already have high-res icons or no manifest found', 'info');
+      }
+    } catch {
+      showToast('Error during batch logo scan', 'error');
+    } finally {
+      setIsBatchScanning(false);
+      setBatchProgress(null);
+    }
+  };
+
+  const handleBatchUpgradeAll = async () => {
+    if (isBatchScanning) return;
+    if (!window.confirm('Scan all saved applications to fetch high-res PWA logos and webmanifests?')) {
+      return;
+    }
+
+    setIsBatchScanning(true);
+    setBatchProgress(null);
+    showToast('Starting full PWA logo scan across all apps...', 'info');
+
+    try {
+      const res = await PwaDetectionService.autoUpgradeAllMissingLogos(
+        apps,
+        (current, total, appName) => {
+          setBatchProgress({ current, total, appName });
+        },
+        true
+      );
+
+      refreshApps();
+      if (res.updatedCount > 0) {
+        showToast(`Updated ${res.updatedCount} application logo(s)!`, 'success');
+      } else {
+        showToast('Scan complete. Existing logos are up to date.', 'info');
+      }
+    } catch {
+      showToast('Error during batch logo scan', 'error');
+    } finally {
+      setIsBatchScanning(false);
+      setBatchProgress(null);
+    }
+  };
 
   useEffect(() => {
     if (isSettingsOpen) {
@@ -402,6 +486,72 @@ export const SettingsModal: React.FC = () => {
             {/* 2. APPS TAB */}
             {activeTab === 'apps' && (
               <div className="space-y-6">
+                {/* PWA Logo Auto-Discovery & Batch Fetch */}
+                <div className="p-4 rounded-2xl glass-subtle border-subtle space-y-3">
+                  <div className="flex items-start justify-between">
+                    <div>
+                      <div className="text-xs font-semibold text-main flex items-center gap-1.5">
+                        <Sparkles className="w-3.5 h-3.5 text-accent" />
+                        PWA Logo Auto-Discovery
+                      </div>
+                      <div className="text-[11px] text-muted mt-0.5">
+                        Scan and fetch official high-resolution logos, webmanifest icons, and apple-touch-icons for your saved PWAs.
+                      </div>
+                    </div>
+                    {missingLogoCount > 0 && (
+                      <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-amber-500/20 text-amber-400 border border-amber-500/30">
+                        {missingLogoCount} without logo
+                      </span>
+                    )}
+                  </div>
+
+                  {batchProgress && (
+                    <div className="p-3 rounded-xl bg-accent/10 border border-accent/20">
+                      <div className="flex items-center justify-between text-xs mb-1.5">
+                        <span className="text-accent font-medium truncate max-w-[240px]">
+                          Scanning: {batchProgress.appName}
+                        </span>
+                        <span className="text-muted text-[11px] font-mono">
+                          {batchProgress.current} / {batchProgress.total}
+                        </span>
+                      </div>
+                      <div className="w-full h-1.5 bg-black/10 dark:bg-white/10 rounded-full overflow-hidden">
+                        <div
+                          className="h-full bg-accent transition-all duration-200"
+                          style={{
+                            width: `${Math.round((batchProgress.current / batchProgress.total) * 100)}%`,
+                          }}
+                        />
+                      </div>
+                    </div>
+                  )}
+
+                  <div className="flex flex-wrap items-center gap-2 pt-1">
+                    <button
+                      type="button"
+                      disabled={isBatchScanning || missingLogoCount === 0}
+                      onClick={handleBatchUpgradeMissing}
+                      className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-accent text-white text-xs font-semibold hover:bg-accent-hover transition-colors shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      {isBatchScanning ? (
+                        <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                      ) : (
+                        <Sparkles className="w-3.5 h-3.5" />
+                      )}
+                      <span>Fetch Missing Logos ({missingLogoCount})</span>
+                    </button>
+                    <button
+                      type="button"
+                      disabled={isBatchScanning || apps.length === 0}
+                      onClick={handleBatchUpgradeAll}
+                      className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl glass-subtle hover-tile border-subtle text-xs font-medium text-main transition-colors disabled:opacity-50"
+                    >
+                      <RefreshCw className={`w-3.5 h-3.5 ${isBatchScanning ? 'animate-spin' : ''}`} />
+                      <span>Force Refetch All Logos ({apps.length})</span>
+                    </button>
+                  </div>
+                </div>
+
                 <div>
                   <label className="block text-xs font-bold uppercase tracking-wider text-muted mb-2">
                     Pinned Apps Sorting
